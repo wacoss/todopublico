@@ -1,264 +1,412 @@
-<!-- https://github.com/wacoss/todopublico/tree/main
-Fuente worker:
-https://dawn-rain-0ea5.jaunin.workers.dev/
-https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/view/dawn-rain-0ea5/production
--->
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f0f2f7" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#4f46e5" id="metaThemeColor" />
   <title>To Do List</title>
+  <meta name="description" content="Aplicación móvil de lista de tareas y recordatorios con almacenamiento local." />
+  <meta property="og:title" content="To Do List" />
+  <meta property="og:description" content="Aplicación móvil de lista de tareas y recordatorios con almacenamiento local." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    .hidden { display: none !important; }
+
     :root {
-      --bg: #f0f2f7;
-      --panel: #FFF;
-      --card: #F9F9F9;
+      --bg: #f3f5f9;
+      --panel: #ffffff;
+      --card: #ffffff;
+      --card-subtle: #f8fafc;
       --surface-2: #edf0f5;
       --surface-2-hover: #e2e6f0;
-      --check-bg: #f8f8f8;
-      --today-bg: #EEF3FD;
-      --today-border: #cdd6f6;
-      --text: #1f2a44;
-      --brandtext: #433ebd;
-      --muted: #78879a;
-      --handle: #a0aec0;
-      --checkbox: #8e9399;
-      --icon: #5b57d6;
-      --icon-hover: #433ebd;
-      --icon-hover-bg: #ded9ff;
-      --danger: #DC3545;
-      --danger-bg: #FEEBE7;
-      --success: #238b5a;
-      --success-bg: #e8f6ee;
-      --border: #d7dde3;
-      --focus-ring: 0 0 0 3px rgba(92, 87, 214, 0.25);
-      --shadow: 0 1px 0 rgba(255,255,255,.5) inset;
-      --radius-xl: 12px;
-      --radius-lg: 8px;
-      --t-fast: .15s ease;
-      --t-base: .18s ease;
+      --check-bg: #f8fafc;
+      --today-bg: #eef2ff;
+      --today-border: #c7d2fe;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --brandtext: #3730a3;
+      --muted: #64748b;
+      --handle: #94a3b8;
+      --checkbox: #94a3b8;
+      --icon: #4f46e5;
+      --icon-hover: #4338ca;
+      --icon-hover-bg: #e0e7ff;
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --success: #10b981;
+      --success-bg: #d1fae5;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --focus-ring: 0 0 0 3px rgba(79, 70, 229, 0.25);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-card: 0 2px 8px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+      --shadow-float: 0 10px 25px -5px rgba(79, 70, 229, 0.3), 0 8px 10px -6px rgba(79, 70, 229, 0.2);
+      --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      --radius-xl: 18px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --t-fast: .15s cubic-bezier(0.4, 0, 0.2, 1);
+      --t-base: .2s cubic-bezier(0.4, 0, 0.2, 1);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
     }
 
     html.dark {
-      --bg:#0c1118;
-      --panel:#141b26;
-      --card:#182130;
-      --surface-2:#1f2937;
-      --surface-2-hover:#28344a;
-      --check-bg:#161f2b;
-      --today-bg:linear-gradient(135deg,#1c2942,#212f4f);
-      --today-border:#3c4f8a;
-      --text:#eef2f8;
-      --brandtext: #eaf1f7;
-      --muted:#93a2b8;
-      --handle:#9fb0c4;
-      --checkbox:#7e8fa3;
-      --icon:#8b83ff;
-      --icon-hover:#a29bff;
-      --icon-hover-bg:rgba(139,131,255,.16);
-      --danger:#ff7b7f;
-      --danger-bg:rgba(255,123,127,.13);
-      --success:#5fd99b;
-      --success-bg:rgba(95,217,155,.13);
-      --border:rgba(255,255,255,.08);
-      --focus-ring:0 0 0 3px rgba(139,131,255,.3);
-      --shadow: 0 1px 0 rgba(255,255,255,.03) inset;
-     --accent-grad:linear-gradient(135deg,#8b83ff,#6b62f0);
+      --bg: #0b0f19;
+      --panel: #131b2e;
+      --card: #172138;
+      --card-subtle: #1a253e;
+      --surface-2: #1e293b;
+      --surface-2-hover: #2d3b55;
+      --check-bg: #151e30;
+      --today-bg: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(99, 102, 241, 0.12));
+      --today-border: rgba(99, 102, 241, 0.45);
+      --text: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --brandtext: #e0e7ff;
+      --muted: #94a3b8;
+      --handle: #64748b;
+      --checkbox: #64748b;
+      --icon: #6366f1;
+      --icon-hover: #818cf8;
+      --icon-hover-bg: rgba(99, 102, 241, 0.18);
+      --danger: #f87171;
+      --danger-bg: rgba(239, 68, 68, 0.16);
+      --success: #34d399;
+      --success-bg: rgba(16, 185, 129, 0.16);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.04);
+      --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.35);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+      --shadow-float: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+      --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    /* Contenedor optimizado para pantalla de celular */
+    .app-viewport {
+      width: 100%;
+      max-width: 520px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      position: relative;
       background: var(--bg);
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
+      padding-bottom: calc(85px + var(--safe-bottom));
     }
 
-    .estado-vacio {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .top-wrapper,
-    .frame {
-      width: 760px;
-      max-width: 100%;
-    }
-
-    .top-wrapper {
+    /* Barra Superior Móvil */
+    .mobile-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: calc(10px + var(--safe-top)) 16px 10px 16px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-group {
+      display: flex;
       align-items: center;
       gap: 10px;
-      padding-top: 6px;
-      padding-left: 16px;
-      padding-right: 16px;
     }
 
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;letter-spacing:-.02em;}
-.brand-badge{width:34px;height:34px;border-radius:6px;background:var(--icon);
-  display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 12px rgba(108,99,255,.35)}
-.brand-titulo {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--brandtext);
-    }
-   .top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;}
-.db-link,.top-action-btn{color:var(--muted);font-size:.85em;text-decoration:none;font-weight:100;
-  border-radius:10px;transition:all var(--t-base);display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;border:1px solid var(--border);padding:9px 14px;background:var(--panel);}
-.db-link:hover,.top-action-btn:hover{color:var(--icon);border-color:var(--icon);transform:translateY(-1px);
-  box-shadow:var(--shadow-card);}
-.db-link:focus-visible,.top-action-btn:focus-visible,.date-button-reset:focus-visible,.cal-btn:focus-visible,
-.cal-day:focus-visible,.action-btn:focus-visible,.title-input:focus,.desc-input:focus{
-  outline:none;box-shadow:var(--focus-ring);border-radius:8px;}
-.db-icon,.theme-icon-only svg,.btn-add-task svg,.action-btn svg{stroke:currentColor;fill:none;
-  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.db-icon{width:15px;height:15px;stroke-width:1.8;}
-.theme-icon-only{width:40px;height:40px;padding:0;}
-.theme-icon-only svg{width:17px;height:17px;stroke-width:2;}
-
-    .frame {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      margin-top: 10px;
-      margin-bottom: 28px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .tabs-header-container {
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--icon), #6366f1);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      gap: 16px;
-    }
-
-    .nav-tabs-custom {
-      display: flex;
-      gap: 24px;
-      padding-bottom: 4px;
-      flex-wrap: wrap;
-    }
-
-    .tab-link {
-      font-size: 1rem;
-      font-weight: 600;
-    
-      color: var(--muted);
-      text-decoration: none;
-      padding-bottom: 8px;
-      border-bottom: 2.5px solid transparent;
-      cursor: pointer;
-      transition: color var(--t-base), border-color var(--t-base);
-    }
-
-    .tab-link:hover { color: var(--text); }
-
-    .tab-link.active {
-      color: var(--icon);
-      border-bottom-color: var(--icon);
-    }
-
-    .btn-add-task {
-      background-color: var(--icon);
+      justify-content: center;
       color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: var(--radius-lg);
-      font-weight: 600;
-      font-size: 0.9rem;
-      font-family: inherit;
-      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+
+    .brand-text-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon-top {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card-subtle);
+      color: var(--muted);
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--t-fast);
+      touch-action: manipulation;
+    }
+
+    .btn-icon-top:active {
+      transform: scale(0.92);
+      background: var(--surface-2-hover);
+    }
+
+    .btn-icon-top svg {
+      width: 19px;
+      height: 19px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn-icon-top.active-push {
+      color: var(--icon);
+      border-color: var(--icon);
+      background: var(--icon-hover-bg);
+    }
+
+    .btn-icon-top.active-push::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--icon);
+      border: 1.5px solid var(--panel);
+    }
+
+    /* Pestañas Móviles Segmentadas */
+    .mobile-tabs-container {
+      padding: 12px 14px 6px 14px;
+    }
+
+    .segmented-tabs {
+      display: flex;
+      background: var(--surface-2);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      gap: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .seg-tab-btn {
+      flex: 1;
+      padding: 9px 4px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 6px;
-      transition: background-color var(--t-base), transform var(--t-base);
+      transition: all var(--t-fast);
+      touch-action: manipulation;
+      position: relative;
     }
 
-    .btn-add-task:hover {
-      background-color: var(--icon-hover);
-      transform: translateY(-1px);
+    .seg-tab-btn.active {
+      background: var(--panel);
+      color: var(--icon);
+      box-shadow: var(--shadow-sm);
     }
 
-    .btn-add-task.hidden { display: none; }
+    .tab-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 12px;
+      background: var(--surface-2-hover);
+      color: var(--muted);
+      line-height: 1.3;
+    }
 
-    .btn-add-task svg {
-      width: 14px;
-      height: 14px;
+    .seg-tab-btn.active .tab-badge {
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+    }
+
+    /* Resumen / Tarjeta del Día */
+    .today-summary-bar {
+      margin: 4px 14px 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .today-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .today-badge-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .today-badge-icon svg {
+      width: 17px;
+      height: 17px;
       stroke-width: 2;
     }
 
-    .list {
-      display: grid;
+    .today-text-date {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .today-metric-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    /* Contenedor de la lista de tareas */
+    .tasks-container {
+      padding: 0 14px 20px 14px;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
 
-    .item {
-      display: grid;
-      grid-template-columns: 22px 84px minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 14px;
-      background: var(--card);
+    /* Tarjetas de Tarea */
+    .task-card {
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 10px 12px;
-      box-shadow: var(--shadow);
-      transition: background-color .18s ease, border-color .18s ease, opacity .18s ease;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+      touch-action: pan-y;
     }
 
-    .item.tarea-eshoy {
+    .task-card.tarea-eshoy {
       background: var(--today-bg);
       border-color: var(--today-border);
     }
 
-    .item.tarea-secundaria {
-      background: var(--panel);
-      grid-template-columns: auto minmax(0, 1fr) auto;
+    .task-card.dragging {
+      opacity: 0.45;
+      transform: scale(0.98);
+      border: 1.5px dashed var(--icon);
     }
 
-    .item.tarea-secundaria.dragging {
-      opacity: 0.4;
-      border: 1px dashed var(--icon);
-      background: var(--icon-hover-bg);
+    /* Fila superior de la tarjeta: checkbox, fecha y acciones rápidas */
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .item.tarea-completada {
-      background: var(--panel);
-      grid-template-columns: 84px minmax(0, 1fr) auto;
-      align-items: start;
+    /* Touch Checkbox */
+    .check-touch-target {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: -6px;
+      touch-action: manipulation;
     }
 
     .check {
       appearance: none;
       -webkit-appearance: none;
-      width: 17px;
-      height: 17px;
-      border: 1.5px solid var(--checkbox);
-      border-radius: 3px;
+      width: 21px;
+      height: 21px;
+      border: 2px solid var(--checkbox);
+      border-radius: var(--radius-sm);
       background: var(--check-bg);
-      margin: 0;
       cursor: pointer;
       position: relative;
+      transition: all var(--t-fast);
+      margin: 0;
     }
 
     .check:checked {
@@ -269,496 +417,768 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     .check:checked::after {
       content: "";
       position: absolute;
-      left: 4px;
-      top: 1px;
-      width: 5px;
-      height: 9px;
+      left: 5px;
+      top: 2px;
+      width: 6px;
+      height: 10px;
       border: solid #fff;
-      border-width: 0 2px 2px 0;
+      border-width: 0 2.2px 2.2px 0;
       transform: rotate(45deg);
     }
 
     .check:disabled {
       cursor: default;
-      opacity: 0.55;
+      opacity: 0.5;
     }
 
-    .date-wrapper {
-      position: relative;
-      min-width: 84px;
-    }
-
-    .date-button-reset {
+    /* Chip de Fecha */
+    .date-chip {
       appearance: none;
       -webkit-appearance: none;
-      display: block;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      font: inherit;
-      color: inherit;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .date-static {
-      display: flex;
-      align-items: center;
-      min-height: 30px;
-      width: 100%;
-      font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--card-subtle);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 0.78rem;
       font-weight: 600;
-      color: var(--text);
-      white-space: nowrap;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      touch-action: manipulation;
     }
 
-    .date-button-reset:hover .date-static,
-    .date-button-reset:focus-visible .date-static,
-    .date-button-reset:focus-within .date-static {
+    .date-chip:active {
+      transform: scale(0.95);
+      border-color: var(--icon);
+    }
+
+    .date-chip svg {
+      width: 13px;
+      height: 13px;
       color: var(--icon);
-      text-decoration: underline;
+      stroke-width: 2;
     }
 
-    .date-button-reset.no-hover {
+    .date-chip.is-today {
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+      border-color: var(--today-border);
+    }
+
+    .date-chip.no-hover {
       cursor: default;
       pointer-events: none;
     }
 
-    .date-button-reset.no-hover:hover .date-static,
-    .date-button-reset.no-hover:focus-visible .date-static,
-    .date-button-reset.no-hover:focus-within .date-static {
-      color: var(--text);
-      text-decoration: none;
+    /* Grupo de Botones de Acción Móvil */
+    .card-actions-group {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .content { min-width: 0; }
+    .touch-action-btn {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      touch-action: manipulation;
+    }
 
-    .title-input,
-    .desc-input,
-    .title-static,
-    .desc-static {
+    .touch-action-btn:active {
+      transform: scale(0.9);
+      background: var(--surface-2-hover);
+    }
+
+    .touch-action-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
+    .touch-action-btn.active-icon {
+      color: var(--icon);
+      background: var(--icon-hover-bg);
+    }
+
+    .touch-action-btn.reminder-active {
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .touch-action-btn.btn-danger {
+      color: var(--danger);
+    }
+
+    .touch-action-btn.btn-danger:active {
+      background: var(--danger-bg);
+    }
+
+    .touch-action-btn.btn-restore {
+      color: var(--success);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .touch-action-btn.btn-restore:active {
+      background: var(--success-bg);
+    }
+
+    /* Área de texto para el título y descripción (16px para evitar auto-zoom de iOS) */
+    .card-body {
       width: 100%;
-      border-radius: 8px;
-      font-family: inherit;
-      line-height: 1.2;
-      /*padding: 4px 6px; */
-      margin-left: -6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .title-input,
     .desc-input {
+      width: 100%;
       border: 1px solid transparent;
+      border-radius: var(--radius-sm);
       background: transparent;
+      font-family: inherit;
       resize: none;
       overflow: hidden;
-    }
-
-    .title-static,
-    .desc-static {
-      border: 1px solid transparent;
-      background: transparent;
-      pointer-events: none;
-      user-select: text;
-    }
-
-    .title-input,
-    .title-static {
-      font-size: 16px;
-      font-weight: 600;
+      outline: none;
       color: var(--text);
-      letter-spacing: -0.02em;
-      /*min-height: 30px;*/
+      line-height: 1.35;
+      padding: 4px 6px;
+      margin-left: -6px;
+      transition: background-color var(--t-fast), border-color var(--t-fast);
     }
 
-    .desc-input,
-    .desc-static {
-      font-size: 13px;
-      color: var(--muted);
-      min-height: 24px;
-      white-space: pre-wrap;
-    }
-
-    .title-input:hover,
-    .desc-input:hover {
-      border-color: var(--border);
+    .title-input {
+      font-size: 16px; /* 16px previene que Safari en iPhone haga zoom involuntario */
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
 
     .title-input:focus,
     .desc-input:focus {
-      border-color: var(--icon);
       background: var(--surface-2);
+      border-color: var(--icon);
     }
 
-    .optional-wrap {
-     /* margin-top: 4px; */
+    .desc-wrap {
+      margin-top: 2px;
+      padding-top: 4px;
+      border-top: 1px dashed var(--border);
     }
 
-    .optional-wrap.hidden {
+    .desc-wrap.hidden {
       display: none;
     }
 
-    .actions {
+    .desc-input {
+      font-size: 14px;
+      color: var(--text-secondary);
+      min-height: 28px;
+    }
+
+    .title-static {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 4px 0;
+    }
+
+    .desc-static {
+      font-size: 13.5px;
+      color: var(--muted);
+      padding: 2px 0;
+      white-space: pre-wrap;
+    }
+
+    /* Botones de Mover arriba/abajo para Secundaria */
+    .reorder-group {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-left: 8px;
-      flex-wrap: wrap;
     }
 
-    .action-btn {
-      width: 30px;
-      height: 30px;
-      border: 0;
-      border-radius: 8px;
+    .btn-reorder-arrow {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
-      color: var(--icon);
       cursor: pointer;
-      transition: background-color var(--t-base), transform var(--t-base), color var(--t-base);
+      touch-action: manipulation;
+      transition: all var(--t-fast);
+      padding: 0;
     }
 
-    .action-btn:hover {
-      transform: translateY(-2px);
-      background: var(--icon-hover-bg);
-    }
-
-    .action-btn.reminder.icon-active {
-      color: var(--danger);
-      background-color: var(--danger-bg);
-    }
-
-    .action-btn.toggle-note.icon-active {
-      color: var(--icon);
-      background: var(--icon-hover-bg);
-    }
-
-    .action-btn.btn-danger-ghost {
-      color: var(--danger);
-    }
-
-    .action-btn.btn-danger-ghost:hover {
-      background-color: var(--danger-bg);
-    }
-
-    .action-btn.btn-success-ghost {
-      color: var(--success);
-    }
-
-    .action-btn.btn-success-ghost:hover {
-      background-color: var(--success-bg);
-    }
-
-    .action-btn svg {
+    .btn-reorder-arrow svg {
       width: 15px;
       height: 15px;
-      stroke-width: 1.8;
+      stroke: currentColor;
+    }
+
+    .btn-reorder-arrow:not(:disabled):active {
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+      border-color: var(--icon);
+      transform: scale(0.92);
+    }
+
+    .btn-reorder-arrow:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
       pointer-events: none;
     }
 
-    .drag-handle {
-      cursor: grab;
-      color: var(--handle);
-      display: inline-flex;
+    /* Estado Vacío */
+    .empty-state-box {
+      text-align: center;
+      padding: 44px 20px;
+      background: var(--panel);
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .empty-icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--muted);
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 8px 0 4px;
-      user-select: none;
-      transition: color var(--t-fast);
     }
 
-    .drag-handle svg {
-      width: 16px;
-      height: 16px;
-      pointer-events: none;
-      fill: currentColor;
+    .empty-icon-circle svg {
+      width: 26px;
+      height: 26px;
+      stroke-width: 1.8;
     }
 
-    .drag-handle:hover {
-      color: var(--icon);
-    }
-
-    .drag-handle:active {
-      cursor: grabbing;
-    }
-
-    .calendario-flotante {
-      position: absolute;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 250px;
-      padding: 14px;
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      user-select: none;
-    }
-
-    .calendario-flotante.show {
-      display: flex;
-    }
-
-    .cal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+    .empty-title {
+      font-size: 1rem;
       font-weight: 700;
-      font-size: 0.95rem;
       color: var(--text);
     }
 
-    .cal-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
+    .empty-subtitle {
+      font-size: 0.85rem;
       color: var(--muted);
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 1rem;
-      transition: background var(--t-fast);
+      max-width: 260px;
+      line-height: 1.4;
     }
 
-    .cal-btn:hover {
+    /* Botón Flotante para Agregar Tarea (FAB) - Optimizado para el Pulgar */
+    .mobile-fab-container {
+      position: fixed;
+      bottom: calc(20px + var(--safe-bottom));
+      right: 20px;
+      z-index: 50;
+    }
+
+    .fab-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--icon), #6366f1);
+      color: #fff;
+      border: none;
+      box-shadow: var(--shadow-float);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
+      touch-action: manipulation;
+    }
+
+    .fab-btn:active {
+      transform: scale(0.9);
+    }
+
+    .fab-btn svg {
+      width: 26px;
+      height: 26px;
+      stroke-width: 2.5;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .fab-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.5);
+    }
+
+    /* Modal / Bottom Sheet del Calendario Móvil */
+    .mobile-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity var(--t-base);
+    }
+
+    .mobile-modal-backdrop.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .calendar-bottom-sheet {
+      width: 100%;
+      max-width: 500px;
+      background: var(--panel);
+      border-top-left-radius: var(--radius-xl);
+      border-top-right-radius: var(--radius-xl);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px calc(24px + var(--safe-bottom)) 20px;
+      box-shadow: var(--shadow-modal);
+      transform: translateY(100%);
+      transition: transform var(--t-base);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .mobile-modal-backdrop.show .calendar-bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 38px;
+      height: 4px;
+      background: var(--handle);
+      border-radius: 4px;
+      margin: 0 auto 6px auto;
+      opacity: 0.6;
+    }
+
+    .cal-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cal-title-month {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .cal-nav-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cal-nav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .cal-nav-btn:active {
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+    }
+
+    /* Accesos rápidos a fechas en el calendario */
+    .cal-quick-picks {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .cal-quick-picks::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cal-quick-pill {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .cal-quick-pill:active {
+      background: var(--icon-hover-bg);
+      color: var(--icon);
+      border-color: var(--icon);
+    }
+
+    .cal-grid-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .cal-day-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 4px 0;
+      text-transform: uppercase;
+    }
+
+    .cal-cell {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      touch-action: manipulation;
+      transition: background-color var(--t-fast), color var(--t-fast);
+    }
+
+    .cal-cell:active {
+      background: var(--surface-2-hover);
+    }
+
+    .cal-cell.today {
+      border-color: var(--icon);
+      color: var(--icon);
+    }
+
+    .cal-cell.selected {
+      background: var(--icon);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);
+    }
+
+    .cal-cell.muted {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .cal-footer-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-sheet-secondary,
+    .btn-sheet-primary {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      touch-action: manipulation;
+    }
+
+    .btn-sheet-secondary {
       background: var(--surface-2);
       color: var(--text);
     }
 
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      text-align: center;
+    .btn-sheet-secondary:active {
+      background: var(--surface-2-hover);
     }
 
-    .cal-day-name {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .cal-day {
-      padding: 6px 0;
-      border-radius: 6px;
-      cursor: pointer;
-      color: var(--text);
-      font-size: 0.85rem;
-      transition: background var(--t-fast);
-      border: none;
-      background: transparent;
-    }
-
-    .cal-day:hover {
-      background: var(--icon-hover-bg);
-      color: var(--icon-hover);
-      font-weight: 600;
-    }
-
-    .cal-day.selected {
+    .btn-sheet-primary {
       background: var(--icon);
       color: #fff;
-      font-weight: 700;
     }
 
-    .cal-day.muted {
-      pointer-events: none;
+    .btn-sheet-primary:active {
+      background: var(--icon-hover);
+    }
+
+    /* Notificación Toast Móvil */
+    .mobile-toast {
+      position: fixed;
+      top: calc(16px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 8px 16px;
+      box-shadow: var(--shadow-modal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      z-index: 1000;
       opacity: 0;
+      transition: transform var(--t-base), opacity var(--t-base);
+      pointer-events: none;
+      white-space: nowrap;
     }
 
-    .cal-day.today {
-      border: 1px solid var(--icon);
+    .mobile-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
     }
 
-    @media (max-width: 700px) {
+    .toast-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--icon);
+    }
+
+    /* Compatibilidad para pantallas grandes / escritorio */
+    @media (min-width: 640px) {
       body {
-        padding: 8px;
+        padding: 20px 10px;
+        background: #e2e8f0;
       }
-
-      .top-wrapper {
-        padding: 4px 6px;
-        margin-bottom: 6px;
+      html.dark body {
+        background: #060910;
       }
-
-      .frame {
-        padding: 16px 12px;
-        margin-top: 4px;
-        border-radius: var(--radius-lg);
+      .app-viewport {
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 880px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       }
-
-      .tabs-header-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        margin-bottom: 16px;
+      .mobile-header {
+        border-top-left-radius: 28px;
+        border-top-right-radius: 28px;
       }
-
-      .nav-tabs-custom {
-        gap: 16px;
-        justify-content: flex-start;
+      .calendar-bottom-sheet {
+        border-radius: var(--radius-xl);
+        margin-bottom: 40px;
       }
-
-      .btn-add-task {
-        width: 100%;
-        justify-content: center;
-        padding: 10px;
-      }
-
-      /* Filas de tareas sin colapso de texto en móviles */
-      .item {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 10px;
-        padding: 10px;
-      }
-
-      .item .check {
-        flex-shrink: 0;
-        order: 1;
-      }
-
-      .item .date-wrapper {
-        order: 2;
-        min-width: auto;
-      }
-
-      .item .date-static {
-        font-size: 12px;
-        min-height: auto;
-      }
-
-      .item .actions {
-        order: 3;
-        margin-left: auto;
-        gap: 4px;
-      }
-
-      .item .content {
-        order: 4;
-        width: 100%;
-        margin-left: 0;
-        padding-left: 2px;
-      }
-
-      .title-input, .desc-input, .title-static, .desc-static {
-        margin-left: 0;
-        padding: 4px 0;
-        font-size: 15px;
-      }
-
-      .item.tarea-secundaria {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      .item.tarea-secundaria .drag-handle {
-        order: 1;
-      }
-
-      .item.tarea-secundaria .content {
-        order: 2;
-        flex: 1 1 calc(100% - 80px);
-      }
-
-      .item.tarea-secundaria .actions {
-        order: 3;
-        margin-left: auto;
-      }
-
-      .item.tarea-completada {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      .item.tarea-completada .date-wrapper {
-        order: 1;
-      }
-
-      .item.tarea-completada .actions {
-        order: 2;
-        margin-left: auto;
-      }
-
-      .item.tarea-completada .content {
-        order: 3;
-        width: 100%;
+      .mobile-fab-container {
+        position: absolute;
       }
     }
-  
-    .top-action-btn.notif-active {
-      color: var(--icon);
-      border-color: var(--icon);
-      background: var(--icon-hover-bg);
-    }
-</style>
+  </style>
 </head>
 <body>
 
-<div class="top-wrapper">
-   <div class="brand">
-    <div class="brand-badge">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+<main class="app-viewport">
+  <!-- Encabezado Móvil Superior -->
+  <header class="mobile-header">
+    <div class="brand-group">
+      <div class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="brand-text-wrap">
+        <span class="brand-title">To Do List</span>
+        <span class="brand-subtitle" id="taskCounterSubtitle">Cargando...</span>
+      </div>
     </div>
-    <span class="brand-titulo">To do localStorage</span>
+
+    <div class="header-actions">
+      <!-- Botón de Recordatorios / Notificaciones Push -->
+      <button id="btnNotificaciones" class="btn-icon-top" type="button" aria-label="Activar notificaciones" onclick="activarNotificacionesPush()" title="Activar recordatorios push">
+        <svg viewBox="0 0 24 24">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </button>
+
+      <!-- Botón de Modo Oscuro / Claro -->
+      <button id="btnTema" class="btn-icon-top" type="button" aria-label="Cambiar tema de color" title="Alternar modo oscuro">
+        <svg id="themeIconSun" class="hidden" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="themeIconMoon" viewBox="0 0 24 24">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Pestañas Móviles Segmentadas -->
+  <nav class="mobile-tabs-container" aria-label="Categorías de tareas">
+    <div class="segmented-tabs" role="tablist">
+      <button class="seg-tab-btn active" id="tabPrincipal" role="tab" aria-selected="true" onclick="cambiarPestana('principal')">
+        <span>Principal</span>
+        <span class="tab-badge" id="badgePrincipal">0</span>
+      </button>
+      <button class="seg-tab-btn" id="tabSecundaria" role="tab" aria-selected="false" onclick="cambiarPestana('secundaria')">
+        <span>Secundaria</span>
+        <span class="tab-badge" id="badgeSecundaria">0</span>
+      </button>
+      <button class="seg-tab-btn" id="tabCompletadas" role="tab" aria-selected="false" onclick="cambiarPestana('completadas')">
+        <span>Completadas</span>
+        <span class="tab-badge" id="badgeCompletadas">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Resumen de Fecha Hoy (solo pestaña Principal) -->
+  <div class="today-summary-bar" id="resumenHoyBar">
+    <div class="today-info">
+      <div class="today-badge-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      </div>
+      <span class="today-text-date" id="bannerHoyFecha">Hoy</span>
+    </div>
+    <span class="today-metric-pill" id="bannerHoyMetrica">0 pendientes</span>
   </div>
 
-  <div class="top-actions">
-    <button id="btnNotificaciones" class="top-action-btn" type="button" aria-label="Activar notificaciones" onclick="activarNotificacionesPush()" title="Activar recordatorios push">
-      <svg class="db-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+  <!-- Lista de Tareas -->
+  <section class="tasks-container" id="listaTareas" aria-label="Lista de tareas">
+    <div class="empty-state-box">
+      <div class="empty-icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+      </div>
+      <span class="empty-title">Cargando tareas...</span>
+    </div>
+  </section>
+
+  <!-- Botón Flotante para Crear Nueva Tarea (FAB) -->
+  <div class="mobile-fab-container">
+    <button id="btnNuevaTarea" class="fab-btn" type="button" aria-label="Crear nueva tarea" onclick="crearNuevaTarea()" title="Nueva tarea">
+      <svg viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
-      Avisos
     </button>
-    <button id="btnTema" class="top-action-btn theme-icon-only" type="button" aria-label="Cambiar tema">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg>
-    </button>
+  </div>
+</main>
+
+<!-- Modal / Bottom Sheet de Selección de Fecha (Calendario Móvil) -->
+<div id="modalCalendario" class="mobile-modal-backdrop" aria-hidden="true" role="dialog" aria-label="Seleccionar fecha">
+  <div class="calendar-bottom-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+
+    <div class="cal-top-bar">
+      <span class="cal-title-month" id="calMesAno">Mes Año</span>
+      <div class="cal-nav-buttons">
+        <button class="cal-nav-btn" type="button" id="calPrev" aria-label="Mes anterior">&lt;</button>
+        <button class="cal-nav-btn" type="button" id="calNext" aria-label="Mes siguiente">&gt;</button>
+      </div>
+    </div>
+
+    <!-- Atajos Rápidos de Fecha Móvil -->
+    <div class="cal-quick-picks">
+      <button class="cal-quick-pill" type="button" onclick="seleccionarAtajoFecha('hoy')">Hoy</button>
+      <button class="cal-quick-pill" type="button" onclick="seleccionarAtajoFecha('manana')">Mañana</button>
+      <button class="cal-quick-pill" type="button" onclick="seleccionarAtajoFecha('semana')">+7 días</button>
+      <button class="cal-quick-pill" type="button" onclick="seleccionarAtajoFecha('sin-fecha')">Sin fecha</button>
+    </div>
+
+    <!-- Nombres de Días -->
+    <div class="cal-grid-days">
+      <div class="cal-day-header">Lu</div>
+      <div class="cal-day-header">Ma</div>
+      <div class="cal-day-header">Mi</div>
+      <div class="cal-day-header">Ju</div>
+      <div class="cal-day-header">Vi</div>
+      <div class="cal-day-header">Sa</div>
+      <div class="cal-day-header">Do</div>
+    </div>
+
+    <!-- Cuadrícula de Días -->
+    <div class="cal-grid-days" id="calGrid"></div>
+
+    <div class="cal-footer-actions">
+      <button class="btn-sheet-secondary" type="button" onclick="cerrarCalendario()">Cancelar</button>
+      <button class="btn-sheet-primary" type="button" onclick="cerrarCalendario()">Listo</button>
+    </div>
   </div>
 </div>
 
-<section class="frame" aria-label="Gestor de Tareas">
-  <div class="tabs-header-container">
-    <div class="nav-tabs-custom" role="tablist">
-      <span class="tab-link active" id="tabPrincipal" role="tab" tabindex="0" aria-selected="true" onclick="cambiarPestana('principal')">Principal</span>
-      <span class="tab-link" id="tabSecundaria" role="tab" tabindex="0" aria-selected="false" onclick="cambiarPestana('secundaria')">Secundaria</span>
-      <span class="tab-link" id="tabCompletadas" role="tab" tabindex="0" aria-selected="false" onclick="cambiarPestana('completadas')">Completadas</span>
-    </div>
-    <button id="btnNuevaTarea" class="btn-add-task" type="button" onclick="crearNuevaTarea()">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      Nueva Tarea
-    </button>
-  </div>
-
-  <div class="list" id="listaTareas"><div class="estado-vacio">Cargando tareas...</div></div>
-</section>
-
-<div id="miCalendario" class="calendario-flotante" aria-hidden="true">
-  <div class="cal-header">
-    <button class="cal-btn" type="button" id="calPrev" aria-label="Mes anterior">&lt;</button>
-    <span id="calMesAno"></span>
-    <button class="cal-btn" type="button" id="calNext" aria-label="Mes siguiente">&gt;</button>
-  </div>
-  <div class="cal-grid" id="calDiasNombres">
-    <div class="cal-day-name">Lu</div><div class="cal-day-name">Ma</div>
-    <div class="cal-day-name">Mi</div><div class="cal-day-name">Ju</div>
-    <div class="cal-day-name">Vi</div><div class="cal-day-name">Sa</div>
-    <div class="cal-day-name">Do</div>
-  </div>
-  <div class="cal-grid" id="calGrid"></div>
+<!-- Toast flotante para avisos móviles -->
+<div id="mobileToast" class="mobile-toast" role="status" aria-live="polite">
+  <div class="toast-dot"></div>
+  <span id="toastMessage">Acción completada</span>
 </div>
 
 <script>
+  // ==========================================
   // Configuración de Web Push y Cloudflare Worker
+  // ==========================================
   const WORKER_URL = 'https://dawn-rain-0ea5.jaunin.workers.dev/'; 
   const VAPID_PUBLIC_KEY = 'BHkz_vETNFSEpTrgIoRmN8BAmetNAbZ0h1W8N1F84aI9zyBteQparaXVtpV_rFPHtKJY4-818yOAdnNYKXsElok'; 
+
+  function mostrarToast(mensaje) {
+    const toast = document.getElementById('mobileToast');
+    const toastMsg = document.getElementById('toastMessage');
+    if (!toast || !toastMsg) return;
+    toastMsg.textContent = mensaje;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2400);
+  }
 
   function urlBase64ToUint8Array(base64String) {
     if (!base64String || base64String.includes('TU_VAPID')) return null;
@@ -785,28 +1205,29 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     const btn = document.getElementById('btnNotificaciones');
     if (!btn) return;
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      btn.style.display = 'none';
+      btn.style.opacity = '0.5';
+      btn.title = 'Notificaciones no soportadas en este navegador';
       return;
     }
     if (Notification.permission === 'granted') {
-      btn.classList.add('notif-active');
-      btn.title = 'Notificaciones push activadas';
+      btn.classList.add('active-push');
+      btn.title = 'Recordatorios push activados';
     } else {
-      btn.classList.remove('notif-active');
-      btn.title = 'Activar recordatorios push';
+      btn.classList.remove('active-push');
+      btn.title = 'Toca para activar recordatorios push';
     }
   }
 
   async function activarNotificacionesPush() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      alert('Tu navegador o dispositivo no soporta notificaciones Web Push.');
+      mostrarToast('Notificaciones no soportadas en este navegador');
       return;
     }
 
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        alert('Permiso de notificaciones no concedido.');
+        mostrarToast('Permiso de notificaciones no concedido');
         actualizarEstadoBotonPush();
         return;
       }
@@ -834,10 +1255,10 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
         await sincronizarRecordatoriosConWorker();
       }
       actualizarEstadoBotonPush();
-      alert('¡Recordatorios activados correctamente!');
+      mostrarToast('¡Recordatorios activados!');
     } catch (err) {
       console.error('Error configurando Web Push:', err);
-      alert('Error activando notificaciones: ' + err.message);
+      mostrarToast('Error al activar recordatorios');
     }
   }
 
@@ -863,10 +1284,12 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     }, 1500);
   }
 
+  // ==========================================
+  // Estado y Persistencia Local
+  // ==========================================
   const STORAGE_KEY = 'todoLocalStorageV10';
-  const THEME_KEY = 'todoLocalThemeV1';
+  const THEME_KEY = 'todoLocalThemeV2';
   
-  // Constantes globales para evitar re-crear los arrays
   const NOMBRES_DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const NOMBRES_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -894,22 +1317,6 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
-  }
-
-  function etiquetaFechaLargaHoy() {
-    const d = new Date();
-    return `Hoy es ${NOMBRES_DIAS[d.getDay()]} ${d.getDate()} de ${NOMBRES_MESES[d.getMonth()]}`;
-  }
-
-  function filaHoyEspecial() {
-    return {
-      id: 'fila-hoy-especial',
-      tarea: etiquetaFechaLargaHoy(),
-      nota: '',
-      fecha: hoyISO(),
-      creada: 0,
-      especial: true
-    };
   }
 
   function clonarEstadoBase() {
@@ -953,6 +1360,7 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   function guardarEstado() {
     safeSetItem(STORAGE_KEY, JSON.stringify(tareasGlobales));
     sincronizarRecordatoriosConWorker();
+    actualizarBadgesYResumen();
   }
 
   function bindAutosize(el) {
@@ -969,17 +1377,20 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     if (pestanaActiva === tipo) return;
     pestanaActiva = tipo;
     cerrarCalendario();
-    document.getElementById('tabPrincipal').classList.toggle('active', tipo === 'principal');
-    document.getElementById('tabSecundaria').classList.toggle('active', tipo === 'secundaria');
-    document.getElementById('tabCompletadas').classList.toggle('active', tipo === 'completadas');
-    document.getElementById('tabPrincipal').setAttribute('aria-selected', String(tipo === 'principal'));
-    document.getElementById('tabSecundaria').setAttribute('aria-selected', String(tipo === 'secundaria'));
-    document.getElementById('tabCompletadas').setAttribute('aria-selected', String(tipo === 'completadas'));
+
+    ['principal', 'secundaria', 'completadas'].forEach(t => {
+      const cap = t.charAt(0).toUpperCase() + t.slice(1);
+      const el = document.getElementById('tab' + cap);
+      if (el) {
+        el.classList.toggle('active', tipo === t);
+        el.setAttribute('aria-selected', String(tipo === t));
+      }
+    });
+
     renderizar();
   }
 
   function obtenerListaActiva() {
-    if (pestanaActiva === 'principal') return [filaHoyEspecial(), ...tareasGlobales.principal];
     return tareasGlobales[pestanaActiva];
   }
 
@@ -994,6 +1405,15 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
 
   function etiquetaFecha(iso) {
     if (!iso) return 'Sin fecha';
+    const hoy = hoyISO();
+    if (iso === hoy) return 'Hoy';
+    
+    // Mañana
+    const manana = new Date();
+    manana.setDate(manana.getDate() + 1);
+    const mStr = `${manana.getFullYear()}-${String(manana.getMonth()+1).padStart(2,'0')}-${String(manana.getDate()).padStart(2,'0')}`;
+    if (iso === mStr) return 'Mañana';
+
     const p = iso.split('-');
     return `${parseInt(p[2], 10)}/${parseInt(p[1], 10)}/${p[0]}`;
   }
@@ -1014,11 +1434,42 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   }
 
   function actualizarBotonNuevaTarea() {
-    document.getElementById('btnNuevaTarea').classList.toggle('hidden', pestanaActiva === 'completadas');
+    const btn = document.getElementById('btnNuevaTarea');
+    if (btn) btn.classList.toggle('hidden', pestanaActiva === 'completadas');
+  }
+
+  function actualizarBadgesYResumen() {
+    const bp = document.getElementById('badgePrincipal');
+    const bs = document.getElementById('badgeSecundaria');
+    const bc = document.getElementById('badgeCompletadas');
+    if (bp) bp.textContent = tareasGlobales.principal.length;
+    if (bs) bs.textContent = tareasGlobales.secundaria.length;
+    if (bc) bc.textContent = tareasGlobales.completadas.length;
+
+    const sub = document.getElementById('taskCounterSubtitle');
+    const totalPendientes = tareasGlobales.principal.length + tareasGlobales.secundaria.length;
+    if (sub) sub.textContent = `${totalPendientes} pendientes`;
+
+    // Resumen fecha hoy
+    const d = new Date();
+    const hoyTexto = `Hoy es ${NOMBRES_DIAS[d.getDay()]} ${d.getDate()} de ${NOMBRES_MESES[d.getMonth()]}`;
+    const bannerFecha = document.getElementById('bannerHoyFecha');
+    if (bannerFecha) bannerFecha.textContent = hoyTexto;
+
+    const tareasHoy = tareasGlobales.principal.filter(t => t.fecha === hoyISO()).length;
+    const bannerMetrica = document.getElementById('bannerHoyMetrica');
+    if (bannerMetrica) bannerMetrica.textContent = `${tareasHoy} para hoy`;
+
+    // Mostrar barra fija de fecha solo en la pestaña "Principal"
+    const resumenBar = document.getElementById('resumenHoyBar');
+    if (resumenBar) {
+      resumenBar.classList.toggle('hidden', pestanaActiva !== 'principal');
+    }
   }
 
   function renderizar() {
     actualizarBotonNuevaTarea();
+    actualizarBadgesYResumen();
     const contenedor = document.getElementById('listaTareas');
     contenedor.innerHTML = '';
 
@@ -1027,203 +1478,191 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
 
     if (tareas.length === 0) {
       const vacio = document.createElement('div');
-      vacio.className = 'estado-vacio';
-      vacio.textContent = pestanaActiva === 'principal'
-        ? 'No hay tareas principales'
-        : pestanaActiva === 'secundaria'
-          ? 'No hay tareas secundarias'
-          : 'No hay tareas completadas';
+      vacio.className = 'empty-state-box';
+      let msg = 'No tienes tareas pendientes.<br>Usa el botón + para añadir una.';
+      if (pestanaActiva === 'secundaria') {
+        msg = 'No tienes tareas secundarias.<br>Usa el botón + para añadir una.';
+      } else if (pestanaActiva === 'completadas') {
+        msg = 'Aún no hay tareas completadas.';
+      }
+      vacio.innerHTML = `
+        <div class="empty-icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+        <span class="empty-title">Lista vacía</span>
+        <span class="empty-subtitle">${msg}</span>
+      `;
       contenedor.appendChild(vacio);
       return;
     }
 
-    tareas.forEach((t, index) => contenedor.appendChild(crearFilaTarea(t, index)));
-    if (pestanaActiva === 'secundaria') inicializarDragAndDropSecundaria(contenedor);
+    tareas.forEach((t, index) => contenedor.appendChild(crearFilaTarea(t, index, tareas.length)));
   }
 
-  function crearFilaTarea(t, index) {
-    const row = document.createElement('article');
-    row.dataset.id = t.id;
-    row.dataset.index = index;
+  function crearFilaTarea(t, index, totalTareas) {
+    const card = document.createElement('article');
+    card.dataset.id = t.id;
+    card.dataset.index = index;
 
-    const esEspecial = !!t.especial;
+    const claseBase = 'task-card';
+    if (pestanaActiva === 'secundaria') card.className = `${claseBase} tarea-secundaria`;
+    else if (pestanaActiva === 'completadas') card.className = `${claseBase} tarea-completada`;
+    else card.className = esHoy(t.fecha) ? `${claseBase} tarea-eshoy` : claseBase;
 
-    if (pestanaActiva === 'secundaria') row.className = 'item tarea-secundaria';
-    else if (pestanaActiva === 'completadas') row.className = 'item tarea-completada';
-    else row.className = esHoy(t.fecha) ? 'item tarea-eshoy' : 'item';
+    // Fila Superior (Checkbox / Fecha / Reordenar / Acciones)
+    const topRow = document.createElement('div');
+    topRow.className = 'card-top-row';
 
-    if (pestanaActiva === 'secundaria') {
-      row.setAttribute('draggable', 'true');
-      row.addEventListener('dragstart', (e) => {
-        row.classList.add('dragging');
-        if (e.dataTransfer) {
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', t.id);
-        }
-      });
-      row.addEventListener('dragend', () => row.classList.remove('dragging'));
-    }
-
+    // Checkbox en Principal
     if (pestanaActiva === 'principal') {
+      const checkWrap = document.createElement('label');
+      checkWrap.className = 'check-touch-target';
+      checkWrap.title = 'Marcar como completada';
+
       const check = document.createElement('input');
       check.className = 'check';
       check.type = 'checkbox';
-      if (!esEspecial) check.title = 'Completar tarea';
-      check.disabled = esEspecial;
-      if (!esEspecial) check.addEventListener('change', () => completarTarea(t.id));
-      row.appendChild(check);
+      check.addEventListener('change', () => {
+        card.style.transform = 'scale(0.95)';
+        card.style.opacity = '0.5';
+        setTimeout(() => completarTarea(t.id), 180);
+      });
 
-      const dateWrapper = document.createElement('div');
-      dateWrapper.className = 'date-wrapper';
+      checkWrap.appendChild(check);
+      topRow.appendChild(checkWrap);
 
-      const dateButton = document.createElement('button');
-      dateButton.className = 'date-button-reset' + (esEspecial ? ' no-hover' : '');
-      dateButton.type = 'button';
-      if (!esEspecial) dateButton.title = 'Cambiar fecha';
+      // Chip de Fecha con icono de calendario
+      const dateChip = document.createElement('button');
+      dateChip.className = 'date-chip' + (esHoy(t.fecha) ? ' is-today' : '');
+      dateChip.type = 'button';
+      dateChip.title = 'Cambiar fecha de la tarea';
+      dateChip.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>${etiquetaFecha(t.fecha)}</span>
+      `;
+      dateChip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        abrirMiCalendario(t.id);
+      });
+      topRow.appendChild(dateChip);
+    }
 
-      const dateText = document.createElement('div');
-      dateText.className = 'date-static';
-      dateText.textContent = etiquetaFecha(t.fecha);
+    // Botones de Mover arriba/abajo en Secundaria
+    if (pestanaActiva === 'secundaria') {
+      const reorderGroup = document.createElement('div');
+      reorderGroup.className = 'reorder-group';
 
-      dateButton.appendChild(dateText);
-
-      if (!esEspecial) {
-        dateButton.addEventListener('click', (e) => {
-          e.stopPropagation();
-          abrirMiCalendario(dateButton, t.id);
-        });
+      const btnUp = document.createElement('button');
+      btnUp.type = 'button';
+      btnUp.className = 'btn-reorder-arrow';
+      btnUp.title = 'Mover arriba';
+      btnUp.setAttribute('aria-label', 'Mover tarea arriba');
+      btnUp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+      if (index === 0) {
+        btnUp.disabled = true;
       } else {
-        dateButton.tabIndex = -1;
-        dateButton.style.pointerEvents = 'none';
-        dateButton.style.cursor = 'default';
+        btnUp.onclick = () => moverTareaSecundaria(t.id, -1);
       }
 
-      dateWrapper.appendChild(dateButton);
-      row.appendChild(dateWrapper);
+      const btnDown = document.createElement('button');
+      btnDown.type = 'button';
+      btnDown.className = 'btn-reorder-arrow';
+      btnDown.title = 'Mover abajo';
+      btnDown.setAttribute('aria-label', 'Mover tarea abajo');
+      btnDown.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+      if (index === (totalTareas || 1) - 1) {
+        btnDown.disabled = true;
+      } else {
+        btnDown.onclick = () => moverTareaSecundaria(t.id, 1);
+      }
+
+      reorderGroup.appendChild(btnUp);
+      reorderGroup.appendChild(btnDown);
+      topRow.appendChild(reorderGroup);
     }
 
-    if (pestanaActiva === 'secundaria') {
-      const drag = document.createElement('div');
-      drag.className = 'drag-handle';
-      drag.title = 'Arrastra para reordenar';
-      drag.setAttribute('aria-hidden', 'true');
-      drag.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>';
-      row.appendChild(drag);
-    }
-
+    // Chip de fecha en Completadas
     if (pestanaActiva === 'completadas') {
-      const dateWrapper = document.createElement('div');
-      dateWrapper.className = 'date-wrapper';
-
-      const dateStatic = document.createElement('div');
-      dateStatic.className = 'date-static';
-      dateStatic.textContent = etiquetaFecha(t.fecha);
-
-      dateWrapper.appendChild(dateStatic);
-      row.appendChild(dateWrapper);
+      const dateChip = document.createElement('div');
+      dateChip.className = 'date-chip no-hover';
+      dateChip.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>${etiquetaFecha(t.fecha)}</span>
+      `;
+      topRow.appendChild(dateChip);
     }
 
-    const content = document.createElement('div');
-    content.className = 'content';
+    // Acciones a la derecha
+    const actions = document.createElement('div');
+    actions.className = 'card-actions-group';
 
+    // Si está en completadas: botón restaurar y eliminar
     if (pestanaActiva === 'completadas') {
+      const restoreBtn = document.createElement('button');
+      restoreBtn.className = 'touch-action-btn btn-restore';
+      restoreBtn.type = 'button';
+      restoreBtn.title = 'Restaurar a Principal';
+      restoreBtn.innerHTML = '↺';
+      restoreBtn.addEventListener('click', () => restablecerTarea(t.id));
+      actions.appendChild(restoreBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'touch-action-btn btn-danger';
+      deleteBtn.type = 'button';
+      deleteBtn.title = 'Eliminar permanentemente';
+      deleteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+      deleteBtn.addEventListener('click', () => eliminarTarea('completadas', t.id));
+      actions.appendChild(deleteBtn);
+
+      topRow.appendChild(actions);
+      card.appendChild(topRow);
+
+      // Cuerpo estático en completadas
+      const body = document.createElement('div');
+      body.className = 'card-body';
       const titleStatic = document.createElement('div');
       titleStatic.className = 'title-static';
       titleStatic.textContent = t.tarea || '';
-      content.appendChild(titleStatic);
+      body.appendChild(titleStatic);
 
       if (t.nota && t.nota.trim() !== '') {
         const descStatic = document.createElement('div');
         descStatic.className = 'desc-static';
         descStatic.textContent = t.nota;
-        content.appendChild(descStatic);
+        body.appendChild(descStatic);
       }
-
-      row.appendChild(content);
-
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-
-      const restoreBtn = document.createElement('button');
-      restoreBtn.className = 'action-btn btn-success-ghost';
-      restoreBtn.type = 'button';
-      restoreBtn.title = 'Restablecer tarea';
-      restoreBtn.textContent = '↺';
-      restoreBtn.addEventListener('click', () => restablecerTarea(t.id));
-      actions.appendChild(restoreBtn);
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'action-btn btn-danger-ghost';
-      deleteBtn.type = 'button';
-      deleteBtn.title = 'Eliminar tarea';
-      deleteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
-      deleteBtn.addEventListener('click', () => eliminarTarea('completadas', t.id));
-      actions.appendChild(deleteBtn);
-
-      row.appendChild(actions);
-      return row;
+      card.appendChild(body);
+      return card;
     }
 
-    if (esEspecial) {
-      const titleStatic = document.createElement('div');
-      titleStatic.className = 'title-static';
-      titleStatic.textContent = t.tarea || '';
-      content.appendChild(titleStatic);
-      row.appendChild(content);
-      row.appendChild(document.createElement('div')).className = 'actions';
-      return row;
-    }
-
-    const titleInput = crearTextarea('title-input', t.tarea, 'Nombre de la tarea', () => {
-      actualizarTarea(pestanaActiva, t.id, { tarea: titleInput.value.trim() || 'Nueva tarea' });
-    });
-    content.appendChild(titleInput);
-
-    const noteWrap = document.createElement('div');
-    noteWrap.className = 'optional-wrap' + (t.nota && t.nota.trim() !== '' ? '' : ' hidden');
-
-    const descInput = crearTextarea('desc-input', t.nota, 'Texto opcional', () => {
-      actualizarTarea(pestanaActiva, t.id, { nota: descInput.value.trim() });
-    });
-
-    noteWrap.appendChild(descInput);
-    content.appendChild(noteWrap);
-    row.appendChild(content);
-
-    const actions = document.createElement('div');
-    actions.className = 'actions';
-
+    // Botón de nota opcional
+    const hasNote = Boolean(t.nota && t.nota.trim() !== '');
     const toggleNoteBtn = document.createElement('button');
-    const noteVisible = !noteWrap.classList.contains('hidden');
-    toggleNoteBtn.className = 'action-btn toggle-note' + (noteVisible ? ' icon-active' : '');
+    toggleNoteBtn.className = 'touch-action-btn' + (hasNote ? ' active-icon' : '');
     toggleNoteBtn.type = 'button';
-    toggleNoteBtn.title = noteVisible ? 'Ocultar texto opcional' : 'Mostrar texto opcional';
+    toggleNoteBtn.title = hasNote ? 'Ocultar nota' : 'Añadir nota';
     toggleNoteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M7 5h10"></path><path d="M7 9h10"></path><path d="M7 13h6"></path></svg>';
-    toggleNoteBtn.addEventListener('click', () => {
-      const isHidden = noteWrap.classList.contains('hidden');
-      noteWrap.classList.toggle('hidden', !isHidden);
-      toggleNoteBtn.classList.toggle('icon-active', isHidden);
-      toggleNoteBtn.title = isHidden ? 'Ocultar texto opcional' : 'Mostrar texto opcional';
-      if (isHidden) requestAnimationFrame(() => descInput.focus());
-    });
     actions.appendChild(toggleNoteBtn);
 
+    // Botón de recordatorio (solo en Principal)
     if (pestanaActiva === 'principal') {
       const reminderBtn = document.createElement('button');
-      reminderBtn.className = 'action-btn reminder' + (t.recordar ? ' icon-active' : '');
+      reminderBtn.className = 'touch-action-btn' + (t.recordar ? ' reminder-active' : '');
       reminderBtn.type = 'button';
-      reminderBtn.title = t.recordar ? 'Desactivar recordatorio' : 'Activar recordatorio';
+      reminderBtn.title = t.recordar ? 'Recordatorio activo (toca para desactivar)' : 'Recordatorio desactivado (toca para activar)';
       reminderBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
       reminderBtn.addEventListener('click', () => {
-        actualizarTarea('principal', t.id, { recordar: !t.recordar });
+        const nuevo = !t.recordar;
+        actualizarTarea('principal', t.id, { recordar: nuevo });
+        mostrarToast(nuevo ? '🔔 Recordatorio activado' : '🔕 Recordatorio desactivado');
       });
       actions.appendChild(reminderBtn);
     }
 
-
+    // Botón eliminar en Secundaria
     if (pestanaActiva === 'secundaria') {
       const delBtn = document.createElement('button');
-      delBtn.className = 'action-btn btn-danger-ghost';
+      delBtn.className = 'touch-action-btn btn-danger';
       delBtn.type = 'button';
       delBtn.title = 'Eliminar tarea';
       delBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
@@ -1231,60 +1670,58 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
       actions.appendChild(delBtn);
     }
 
-    row.appendChild(actions);
-    return row;
+    topRow.appendChild(actions);
+    card.appendChild(topRow);
+
+    // Cuerpo de la tarjeta: Título y Nota editable
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const titleInput = crearTextarea('title-input', t.tarea, 'Escribe el nombre de la tarea...', () => {
+      actualizarTarea(pestanaActiva, t.id, { tarea: titleInput.value.trim() || 'Nueva tarea' });
+    });
+    body.appendChild(titleInput);
+
+    const descWrap = document.createElement('div');
+    descWrap.className = 'desc-wrap' + (hasNote ? '' : ' hidden');
+
+    const descInput = crearTextarea('desc-input', t.nota, 'Detalles o nota opcional...', () => {
+      actualizarTarea(pestanaActiva, t.id, { nota: descInput.value.trim() });
+    });
+
+    descWrap.appendChild(descInput);
+    body.appendChild(descWrap);
+    card.appendChild(body);
+
+    toggleNoteBtn.addEventListener('click', () => {
+      const isHidden = descWrap.classList.contains('hidden');
+      descWrap.classList.toggle('hidden', !isHidden);
+      toggleNoteBtn.classList.toggle('active-icon', isHidden);
+      if (isHidden) {
+        requestAnimationFrame(() => descInput.focus());
+      }
+    });
+
+    // Soporte Drag and Drop escritorio
+    return card;
   }
 
-  function inicializarDragAndDropSecundaria(contenedor) {
-    contenedor.ondragenter = (e) => {
-      if (pestanaActiva !== 'secundaria') return;
-      e.preventDefault();
-      if (e.dataTransfer) {
-        e.dataTransfer.dropEffect = 'move';
-      }
-    };
+  function moverTareaSecundaria(id, direccion) {
+    const idx = tareasGlobales.secundaria.findIndex(t => t.id === id);
+    if (idx === -1) return;
+    const nuevoIdx = idx + direccion;
+    if (nuevoIdx < 0 || nuevoIdx >= tareasGlobales.secundaria.length) return;
 
-    contenedor.ondragover = (e) => {
-      if (pestanaActiva !== 'secundaria') return;
-      e.preventDefault();
-      
-      if (e.dataTransfer) {
-        e.dataTransfer.dropEffect = 'move';
-      }
-      
-      const draggingItem = contenedor.querySelector('.dragging');
-      if (!draggingItem) return;
-      const items = [...contenedor.querySelectorAll('.tarea-secundaria:not(.dragging)')];
-      const siguiente = items.find(i => e.clientY - i.getBoundingClientRect().top - i.getBoundingClientRect().height / 2 < 0);
-      if (siguiente == null) contenedor.appendChild(draggingItem);
-      else contenedor.insertBefore(draggingItem, siguiente);
-    };
-
-    contenedor.ondrop = (e) => {
-      if (pestanaActiva !== 'secundaria') return;
-      e.preventDefault();
-      guardarNuevoOrdenSecundarias();
-    };
-  }
-
-  function guardarNuevoOrdenSecundarias() {
-    const contenedor = document.getElementById('listaTareas');
-    const items = [...contenedor.querySelectorAll('.tarea-secundaria')];
-    const idsOrdenados = items.map(item => item.dataset.id);
-    tareasGlobales.secundaria.sort((a, b) => idsOrdenados.indexOf(a.id) - idsOrdenados.indexOf(b.id));
+    const [item] = tareasGlobales.secundaria.splice(idx, 1);
+    tareasGlobales.secundaria.splice(nuevoIdx, 0, item);
     guardarEstado();
     renderizar();
   }
 
-  function abrirMiCalendario(elemento, taskId) {
-    const cal = document.getElementById('miCalendario');
-    
-    // Si el calendario ya está abierto para esta misma tarea, lo cerramos
-    if (cal.classList.contains('show') && tareaCalendarioId === taskId) {
-      cerrarCalendario();
-      return;
-    }
-
+  // ==========================================
+  // Calendario Móvil (Bottom Sheet Modal)
+  // ==========================================
+  function abrirMiCalendario(taskId) {
     tareaCalendarioId = taskId;
     const tarea = tareasGlobales.principal.find(t => t.id === taskId);
     if (!tarea || tarea.especial) return;
@@ -1300,32 +1737,19 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     }
 
     dibujarMes();
-    posicionarCalendario(elemento);
-  }
-
-  function posicionarCalendario(elemento) {
-    const cal = document.getElementById('miCalendario');
-    const rect = elemento.getBoundingClientRect();
-    const CALENDAR_OFFSET_Y = -90;
-    const CALENDAR_OFFSET_X = 260;
-    const CALENDAR_MIN_LEFT = 10;
-
-    if (cal.parentNode !== document.body) document.body.appendChild(cal);
-    cal.style.position = 'absolute';
-    cal.style.top = (rect.top + window.scrollY + CALENDAR_OFFSET_Y) + 'px';
-
-    let leftPos = rect.left + window.scrollX - CALENDAR_OFFSET_X;
-    if (leftPos < CALENDAR_MIN_LEFT) leftPos = CALENDAR_MIN_LEFT;
-
-    cal.style.left = leftPos + 'px';
-    cal.classList.add('show');
-    cal.setAttribute('aria-hidden', 'false');
+    const modal = document.getElementById('modalCalendario');
+    if (modal) {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+    }
   }
 
   function cerrarCalendario() {
-    const cal = document.getElementById('miCalendario');
-    cal.classList.remove('show');
-    cal.setAttribute('aria-hidden', 'true');
+    const modal = document.getElementById('modalCalendario');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
     tareaCalendarioId = null;
   }
 
@@ -1343,7 +1767,8 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   }
 
   function dibujarMes() {
-    document.getElementById('calMesAno').innerText = `${NOMBRES_MESES[calMesAct]} ${calAñoAct}`;
+    const titulo = document.getElementById('calMesAno');
+    if (titulo) titulo.innerText = `${NOMBRES_MESES[calMesAct]} ${calAñoAct}`;
 
     const diasMes = new Date(calAñoAct, calMesAct + 1, 0).getDate();
     const indexPrimerDia = new Date(calAñoAct, calMesAct, 1).getDay();
@@ -1356,21 +1781,22 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     const fechaSeleccionada = tarea ? tarea.fecha : '';
 
     let html = '';
-    for (let i = 0; i < inicio; i++) html += '<div class="cal-day muted"></div>';
+    for (let i = 0; i < inicio; i++) html += '<div class="cal-cell muted"></div>';
 
     for (let i = 1; i <= diasMes; i++) {
       const d = String(i).padStart(2, '0');
       const m = String(calMesAct + 1).padStart(2, '0');
       const fechaStr = `${calAñoAct}-${m}-${d}`;
 
-      let claseExtra = '';
-      if (fechaSeleccionada === fechaStr) claseExtra += ' selected';
-      if (fechaStr === hoyStr) claseExtra += ' today';
+      let clases = 'cal-cell';
+      if (fechaSeleccionada === fechaStr) clases += ' selected';
+      if (fechaStr === hoyStr) clases += ' today';
 
-      html += `<button type="button" class="cal-day${claseExtra}" data-fecha="${fechaStr}">${i}</button>`;
+      html += `<button type="button" class="${clases}" data-fecha="${fechaStr}">${i}</button>`;
     }
 
-    document.getElementById('calGrid').innerHTML = html;
+    const grid = document.getElementById('calGrid');
+    if (grid) grid.innerHTML = html;
   }
 
   function seleccionarDia(fechaStr) {
@@ -1379,12 +1805,43 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     const nuevaFecha = tarea.fecha === fechaStr ? '' : fechaStr;
     actualizarTarea('principal', tarea.id, { fecha: nuevaFecha });
     cerrarCalendario();
+    mostrarToast(nuevaFecha ? `Fecha asignada: ${etiquetaFecha(nuevaFecha)}` : 'Fecha eliminada');
   }
 
+  function seleccionarAtajoFecha(tipo) {
+    const tarea = tareasGlobales.principal.find(t => t.id === tareaCalendarioId);
+    if (!tarea || tarea.especial) return;
+
+    let targetDate = '';
+    const hoy = new Date();
+
+    if (tipo === 'hoy') {
+      targetDate = hoyISO();
+    } else if (tipo === 'manana') {
+      const m = new Date();
+      m.setDate(hoy.getDate() + 1);
+      targetDate = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}-${String(m.getDate()).padStart(2, '0')}`;
+    } else if (tipo === 'semana') {
+      const m = new Date();
+      m.setDate(hoy.getDate() + 7);
+      targetDate = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}-${String(m.getDate()).padStart(2, '0')}`;
+    } else if (tipo === 'sin-fecha') {
+      targetDate = '';
+    }
+
+    actualizarTarea('principal', tarea.id, { fecha: targetDate });
+    cerrarCalendario();
+    mostrarToast(targetDate ? `Fecha asignada: ${etiquetaFecha(targetDate)}` : 'Fecha eliminada');
+  }
+
+  // ==========================================
+  // Operaciones de Tareas (CRUD)
+  // ==========================================
   function crearNuevaTarea() {
     const destino = pestanaActiva === 'completadas' ? 'principal' : pestanaActiva;
+    const nuevaId = uid();
     tareasGlobales[destino].push({
-      id: uid(),
+      id: nuevaId,
       tarea: 'Nueva tarea',
       nota: '',
       fecha: destino === 'principal' ? hoyISO() : '',
@@ -1392,8 +1849,27 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
       creada: Date.now()
     });
     guardarEstado();
-    if (pestanaActiva === 'completadas') cambiarPestana('principal');
-    else renderizar();
+
+    if (pestanaActiva === 'completadas') {
+      cambiarPestana('principal');
+    } else {
+      renderizar();
+    }
+
+    // Enfocar automáticamente la nueva tarea creada
+    requestAnimationFrame(() => {
+      const newCard = document.querySelector(`.task-card[data-id="${nuevaId}"]`);
+      if (newCard) {
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = newCard.querySelector('.title-input');
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    });
+
+    mostrarToast('Nueva tarea añadida');
   }
 
   function actualizarTarea(lista, id, patch) {
@@ -1405,10 +1881,11 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   }
 
   function eliminarTarea(lista, id) {
-    if (!confirm('¿Eliminar tarea?')) return;
+    if (!confirm('¿Eliminar esta tarea?')) return;
     tareasGlobales[lista] = tareasGlobales[lista].filter(x => x.id !== id);
     guardarEstado();
     renderizar();
+    mostrarToast('Tarea eliminada');
   }
 
   function completarTarea(id) {
@@ -1420,6 +1897,7 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     tareasGlobales.completadas.unshift({ ...tarea, recordar: false });
     guardarEstado();
     renderizar();
+    mostrarToast('¡Tarea completada! 🎉');
   }
 
   function restablecerTarea(id) {
@@ -1435,72 +1913,70 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     });
     guardarEstado();
     cambiarPestana('principal');
+    mostrarToast('Tarea restaurada a Principal');
   }
 
+  // ==========================================
+  // Tema Claro / Oscuro
+  // ==========================================
   function aplicarTema(theme) {
     const isDark = theme === 'dark';
     document.documentElement.classList.toggle('dark', isDark);
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#1a2733' : '#f0f2f7');
+
+    const sun = document.getElementById('themeIconSun');
+    const moon = document.getElementById('themeIconMoon');
+    if (sun && moon) {
+      sun.classList.toggle('hidden', !isDark);
+      moon.classList.toggle('hidden', isDark);
+    }
+
+    const metaTheme = document.getElementById('metaThemeColor');
+    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0b0f19' : '#4f46e5');
   }
 
   function inicializarTema() {
     const saved = safeGetItem(THEME_KEY) || 'light';
     aplicarTema(saved);
-    document.getElementById('btnTema').addEventListener('click', () => {
-      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-      safeSetItem(THEME_KEY, next);
-      aplicarTema(next);
-    });
+
+    const btnTema = document.getElementById('btnTema');
+    if (btnTema) {
+      btnTema.addEventListener('click', () => {
+        const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+        safeSetItem(THEME_KEY, next);
+        aplicarTema(next);
+        mostrarToast(next === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado');
+      });
+    }
   }
 
-  document.addEventListener('click', (e) => {
-    const cal = document.getElementById('miCalendario');
-    if (cal.classList.contains('show') && !cal.contains(e.target) && !e.target.closest('.date-button-reset')) {
-      cerrarCalendario();
-    }
-  });
-
+  // ==========================================
+  // Inicialización de la Aplicación
+  // ==========================================
   document.addEventListener('DOMContentLoaded', () => {
     actualizarEstadoBotonPush();
-    // Permitir arrastrar sobre toda la pantalla sin cursor prohibido
-    document.body.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-    });
-    document.body.addEventListener('drop', (e) => e.preventDefault());
-
     inicializarTema();
 
-    document.getElementById('tabPrincipal').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        cambiarPestana('principal');
-      }
-    });
+    // Eventos del calendario móvil
+    const calPrev = document.getElementById('calPrev');
+    const calNext = document.getElementById('calNext');
+    if (calPrev) calPrev.addEventListener('click', () => cambiarMes(-1));
+    if (calNext) calNext.addEventListener('click', () => cambiarMes(1));
 
-    document.getElementById('tabSecundaria').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        cambiarPestana('secundaria');
-      }
-    });
+    const calGrid = document.getElementById('calGrid');
+    if (calGrid) {
+      calGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.cal-cell[data-fecha]');
+        if (!btn) return;
+        seleccionarDia(btn.dataset.fecha);
+      });
+    }
 
-    document.getElementById('tabCompletadas').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        cambiarPestana('completadas');
-      }
-    });
-
-    document.getElementById('calPrev').addEventListener('click', () => cambiarMes(-1));
-    document.getElementById('calNext').addEventListener('click', () => cambiarMes(1));
-
-    document.getElementById('calGrid').addEventListener('click', (e) => {
-      const btn = e.target.closest('.cal-day[data-fecha]');
-      if (!btn) return;
-      seleccionarDia(btn.dataset.fecha);
-    });
+    const modalCal = document.getElementById('modalCalendario');
+    if (modalCal) {
+      modalCal.addEventListener('click', (e) => {
+        if (e.target === modalCal) cerrarCalendario();
+      });
+    }
 
     renderizar();
   });
