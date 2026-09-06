@@ -1740,7 +1740,7 @@
     const descWrap = document.createElement('div');
     descWrap.className = 'desc-wrap' + (hasNote ? '' : ' hidden');
 
-    const descInput = crearTextarea('desc-input', t.nota, 'Detalles o nota opcional...', () => {
+    const descInput = crearTextarea('desc-input', t.nota, 'Nota adicional...', () => {
       actualizarTarea(pestanaActiva, t.id, { nota: descInput.value.trim() });
     });
 
