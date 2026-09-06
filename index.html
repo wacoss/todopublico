@@ -1357,15 +1357,25 @@
   }
 
   function normalizarEstado(data) {
-    const normalizeTask = (t) => ({
-      id: t && t.id ? t.id : uid(),
-      tarea: t && t.tarea ? t.tarea : 'Nueva tarea',
-      nota: t && t.nota ? t.nota : '',
-      fecha: t && t.fecha ? t.fecha : '',
-      recordar: !!(t && t.recordar),
-      creada: t && t.creada ? t.creada : Date.now(),
-      especial: !!(t && t.especial)
-    });
+    const normalizeTask = (t) => {
+      let nota = t && t.nota ? t.nota : '';
+      if (nota.toLowerCase() === 'opcional aquí' || nota.toLowerCase() === 'opcional aqui') {
+        nota = 'Nota adicional....';
+      }
+      let tarea = t && t.tarea ? t.tarea : 'Nueva tarea';
+      if (tarea.toLowerCase() === 'opcional aquí' || tarea.toLowerCase() === 'opcional aqui') {
+        tarea = 'Nota adicional....';
+      }
+      return {
+        id: t && t.id ? t.id : uid(),
+        tarea,
+        nota,
+        fecha: t && t.fecha ? t.fecha : '',
+        recordar: !!(t && t.recordar),
+        creada: t && t.creada ? t.creada : Date.now(),
+        especial: !!(t && t.especial)
+      };
+    };
 
     return {
       principal: Array.isArray(data && data.principal) ? data.principal.map(normalizeTask) : [],
@@ -1740,7 +1750,11 @@
     const descWrap = document.createElement('div');
     descWrap.className = 'desc-wrap' + (hasNote ? '' : ' hidden');
 
-    const descInput = crearTextarea('desc-input', t.nota, 'Nota adicional...', () => {
+    const placeholderNota = pestanaActiva === 'secundaria' ? 'Nota adicional....' : 'Nota adicional....';
+    if (t.nota && (t.nota.toLowerCase() === 'opcional aquí' || t.nota.toLowerCase() === 'opcional aqui')) {
+      t.nota = 'Nota adicional....';
+    }
+    const descInput = crearTextarea('desc-input', t.nota, placeholderNota, () => {
       actualizarTarea(pestanaActiva, t.id, { nota: descInput.value.trim() });
     });
 
