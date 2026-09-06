@@ -25,8 +25,8 @@
       --surface-2: #edf0f5;
       --surface-2-hover: #e2e6f0;
       --check-bg: #f8fafc;
-      --today-bg: #f0fdf4;
-      --today-border: #bbf7d0;
+      --today-bg: #eef2ff;
+      --today-border: #c7d2fe;
       --text: #0f172a;
       --text-secondary: #475569;
       --brandtext: #3730a3;
@@ -65,8 +65,8 @@
       --surface-2: #1e293b;
       --surface-2-hover: #2d3b55;
       --check-bg: #151e30;
-      --today-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(5, 150, 105, 0.1));
-      --today-border: rgba(52, 211, 153, 0.35);
+      --today-bg: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(99, 102, 241, 0.12));
+      --today-border: rgba(99, 102, 241, 0.45);
       --text: #f8fafc;
       --text-secondary: #cbd5e1;
       --brandtext: #e0e7ff;
@@ -162,17 +162,11 @@
     }
 
     .brand-title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--text);
       line-height: 1.2;
-    }
-
-    .brand-subtitle {
-      font-size: 0.72rem;
-      color: var(--muted);
-      font-weight: 500;
     }
 
     .header-actions {
@@ -286,40 +280,29 @@
       color: var(--icon);
     }
 
-    /* Resumen / Tarjeta del Día */
+    /* Fila de Fecha de Hoy (intercalada cronológicamente) */
     .today-summary-bar {
-      margin: 4px 14px 10px 14px;
+      margin: 0;
       background: var(--today-bg);
       border: 1px solid var(--today-border);
       border-radius: var(--radius-lg);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .today-info {
+      padding: 11px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
+      box-shadow: var(--shadow-sm);
     }
 
     .today-badge-icon {
       width: 32px;
       height: 32px;
       border-radius: var(--radius-md);
-      background: #dcfce7;
-      color: #16a34a;
+      background: var(--icon-hover-bg);
+      color: var(--icon);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-    }
-
-    html.dark .today-badge-icon {
-      background: rgba(16, 185, 129, 0.22);
-      color: #34d399;
     }
 
     .today-badge-icon svg {
@@ -332,22 +315,6 @@
       font-size: 0.85rem;
       font-weight: 600;
       color: var(--text);
-    }
-
-    .today-metric-pill {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 9px;
-      border-radius: 20px;
-      background: #dcfce7;
-      color: #15803d;
-      border: 1px solid #bbf7d0;
-    }
-
-    html.dark .today-metric-pill {
-      background: rgba(16, 185, 129, 0.22);
-      color: #6ee7b7;
-      border: 1px solid rgba(52, 211, 153, 0.35);
     }
 
     /* Contenedor de la lista de tareas */
@@ -473,23 +440,13 @@
     }
 
     .date-chip.is-today {
-      background: #dcfce7;
-      color: #15803d;
+      background: var(--icon-hover-bg);
+      color: var(--icon);
       border-color: var(--today-border);
     }
 
     .date-chip.is-today svg {
-      color: #16a34a;
-    }
-
-    html.dark .date-chip.is-today {
-      background: rgba(16, 185, 129, 0.22);
-      color: #6ee7b7;
-      border-color: var(--today-border);
-    }
-
-    html.dark .date-chip.is-today svg {
-      color: #34d399;
+      color: var(--icon);
     }
 
     .date-chip.no-hover {
@@ -923,8 +880,8 @@
     }
 
     .cal-cell.today {
-      border-color: #10b981;
-      color: #10b981;
+      border-color: var(--icon);
+      color: var(--icon);
       font-weight: 700;
     }
 
@@ -1054,7 +1011,6 @@
       </div>
       <div class="brand-text-wrap">
         <span class="brand-title">To Do List</span>
-        <span class="brand-subtitle" id="taskCounterSubtitle">Cargando...</span>
       </div>
     </div>
 
@@ -1104,17 +1060,6 @@
       </button>
     </div>
   </nav>
-
-  <!-- Resumen de Fecha Hoy (solo pestaña Principal) -->
-  <div class="today-summary-bar" id="resumenHoyBar">
-    <div class="today-info">
-      <div class="today-badge-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-      </div>
-      <span class="today-text-date" id="bannerHoyFecha">Hoy</span>
-    </div>
-    <span class="today-metric-pill" id="bannerHoyMetrica">0 pendientes</span>
-  </div>
 
   <!-- Lista de Tareas -->
   <section class="tasks-container" id="listaTareas" aria-label="Lista de tareas">
@@ -1384,7 +1329,7 @@
   function guardarEstado() {
     safeSetItem(STORAGE_KEY, JSON.stringify(tareasGlobales));
     sincronizarRecordatoriosConWorker();
-    actualizarBadgesYResumen();
+    actualizarBadges();
   }
 
   function bindAutosize(el) {
@@ -1462,51 +1407,78 @@
     if (btn) btn.classList.toggle('hidden', pestanaActiva === 'completadas');
   }
 
-  function actualizarBadgesYResumen() {
+  function actualizarBadges() {
     const bp = document.getElementById('badgePrincipal');
     const bs = document.getElementById('badgeSecundaria');
     const bc = document.getElementById('badgeCompletadas');
     if (bp) bp.textContent = tareasGlobales.principal.length;
     if (bs) bs.textContent = tareasGlobales.secundaria.length;
     if (bc) bc.textContent = tareasGlobales.completadas.length;
+  }
 
-    const sub = document.getElementById('taskCounterSubtitle');
-    const totalPendientes = tareasGlobales.principal.length + tareasGlobales.secundaria.length;
-    if (sub) sub.textContent = `${totalPendientes} pendientes`;
-
-    // Resumen fecha hoy
+  function crearFilaHoy() {
+    const bar = document.createElement('div');
+    bar.className = 'today-summary-bar';
+    bar.id = 'resumenHoyBar';
     const d = new Date();
     const hoyTexto = `Hoy es ${NOMBRES_DIAS[d.getDay()]} ${d.getDate()} de ${NOMBRES_MESES[d.getMonth()]}`;
-    const bannerFecha = document.getElementById('bannerHoyFecha');
-    if (bannerFecha) bannerFecha.textContent = hoyTexto;
 
-    const tareasHoy = tareasGlobales.principal.filter(t => t.fecha === hoyISO()).length;
-    const bannerMetrica = document.getElementById('bannerHoyMetrica');
-    if (bannerMetrica) bannerMetrica.textContent = `${tareasHoy} para hoy`;
-
-    // Mostrar barra fija de fecha solo en la pestaña "Principal"
-    const resumenBar = document.getElementById('resumenHoyBar');
-    if (resumenBar) {
-      resumenBar.classList.toggle('hidden', pestanaActiva !== 'principal');
-    }
+    bar.innerHTML = `
+      <div class="today-badge-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      </div>
+      <span class="today-text-date">${hoyTexto}</span>
+    `;
+    return bar;
   }
 
   function renderizar() {
     actualizarBotonNuevaTarea();
-    actualizarBadgesYResumen();
+    actualizarBadges();
     const contenedor = document.getElementById('listaTareas');
     contenedor.innerHTML = '';
 
     let tareas = obtenerListaActiva().slice();
     if (pestanaActiva === 'principal' || pestanaActiva === 'completadas') tareas = ordenarPorFecha(tareas);
 
+    if (pestanaActiva === 'principal') {
+      let filaHoyInsertada = false;
+      const hoy = hoyISO();
+
+      tareas.forEach((t, index) => {
+        // Intercalar la fila de hoy en su orden cronológico exacto
+        if (!filaHoyInsertada && (!t.fecha || t.fecha >= hoy)) {
+          contenedor.appendChild(crearFilaHoy());
+          filaHoyInsertada = true;
+        }
+        contenedor.appendChild(crearFilaTarea(t, index, tareas.length));
+      });
+
+      // Si todas las tareas tenían fecha previa a hoy (o no hay tareas)
+      if (!filaHoyInsertada) {
+        contenedor.appendChild(crearFilaHoy());
+      }
+
+      if (tareas.length === 0) {
+        const vacio = document.createElement('div');
+        vacio.className = 'empty-state-box';
+        vacio.innerHTML = `
+          <div class="empty-icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <span class="empty-title">Lista vacía</span>
+          <span class="empty-subtitle">No tienes tareas pendientes.<br>Usa el botón + para añadir una.</span>
+        `;
+        contenedor.appendChild(vacio);
+      }
+      return;
+    }
+
     if (tareas.length === 0) {
       const vacio = document.createElement('div');
       vacio.className = 'empty-state-box';
-      let msg = 'No tienes tareas pendientes.<br>Usa el botón + para añadir una.';
-      if (pestanaActiva === 'secundaria') {
-        msg = 'No tienes tareas secundarias.<br>Usa el botón + para añadir una.';
-      } else if (pestanaActiva === 'completadas') {
+      let msg = 'No tienes tareas secundarias.<br>Usa el botón + para añadir una.';
+      if (pestanaActiva === 'completadas') {
         msg = 'Aún no hay tareas completadas.';
       }
       vacio.innerHTML = `
