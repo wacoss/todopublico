@@ -1,4 +1,4 @@
-import { PushBuilder } from '@pushforge/builder';
+import { buildPushPayload } from '@pushforge/builder';
 
 function normalizarRuta(pathname) {
   return pathname.replace(/\/{2,}/g, '/');
