@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
@@ -421,6 +423,11 @@
       background: var(--icon-hover-bg);
     }
 
+    .action-btn.reminder.icon-active {
+      color: var(--danger);
+      background-color: var(--danger-bg);
+    }
+
     .action-btn.toggle-note.icon-active {
       color: var(--icon);
       background: var(--icon-hover-bg);
@@ -663,8 +670,8 @@
 
 <script>
   // Configuración de Web Push y Cloudflare Worker
-  const WORKER_URL = 'https://dawn-rain-0ea5.jaunin.workers.dev/'; // Reemplazar con tu URL de Cloudflare
-  const VAPID_PUBLIC_KEY = 'BHkz_vETNFSEpTrgIoRmN8BAmetNAbZ0h1W8N1F84aI9zyBteQparaXVtpV_rFPHtKJY4-818yOAdnNYKXsElok'; // Clave pública generada
+  const WORKER_URL = 'https://dawn-rain-0ea5.jaunin.workers.dev/'; 
+  const VAPID_PUBLIC_KEY = 'BHkz_vETNFSEpTrgIoRmN8BAmetNAbZ0h1W8N1F84aI9zyBteQparaXVtpV_rFPHtKJY4-818yOAdnNYKXsElok'; 
 
   function urlBase64ToUint8Array(base64String) {
     if (!base64String || base64String.includes('TU_VAPID')) return null;
@@ -755,7 +762,7 @@
       try {
         const userId = obtenerUserId();
         const tareasConFecha = (tareasGlobales.principal || [])
-          .filter(t => !t.especial && t.fecha)
+          .filter(t => !t.especial && t.fecha && t.recordar)
           .map(t => ({ id: t.id, tarea: t.tarea, nota: t.nota, fecha: t.fecha }));
 
         await fetch(`${WORKER_URL}/api/reminders`, {
@@ -821,7 +828,7 @@
   function clonarEstadoBase() {
     return {
       principal: [
-        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), creada: Date.now() }
+        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), recordar: true, creada: Date.now() }
       ],
       secundaria: [],
       completadas: []
@@ -844,6 +851,7 @@
       tarea: t && t.tarea ? t.tarea : 'Nueva tarea',
       nota: t && t.nota ? t.nota : '',
       fecha: t && t.fecha ? t.fecha : '',
+      recordar: !!(t && t.recordar),
       creada: t && t.creada ? t.creada : Date.now(),
       especial: !!(t && t.especial)
     });
@@ -1113,6 +1121,18 @@
     });
     actions.appendChild(toggleNoteBtn);
 
+    if (pestanaActiva === 'principal') {
+      const reminderBtn = document.createElement('button');
+      reminderBtn.className = 'action-btn reminder' + (t.recordar ? ' icon-active' : '');
+      reminderBtn.type = 'button';
+      reminderBtn.title = t.recordar ? 'Desactivar recordatorio' : 'Activar recordatorio';
+      reminderBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
+      reminderBtn.addEventListener('click', () => {
+        actualizarTarea('principal', t.id, { recordar: !t.recordar });
+      });
+      actions.appendChild(reminderBtn);
+    }
+
 
     if (pestanaActiva === 'secundaria') {
       const delBtn = document.createElement('button');
@@ -1281,6 +1301,7 @@
       tarea: 'Nueva tarea',
       nota: '',
       fecha: destino === 'principal' ? hoyISO() : '',
+      recordar: destino === 'principal',
       creada: Date.now()
     });
     guardarEstado();
@@ -1309,7 +1330,7 @@
     const tarea = tareasGlobales.principal[idx];
     if (tarea.especial) return;
     tareasGlobales.principal.splice(idx, 1);
-    tareasGlobales.completadas.unshift({ ...tarea });
+    tareasGlobales.completadas.unshift({ ...tarea, recordar: false });
     guardarEstado();
     renderizar();
   }
@@ -1322,6 +1343,7 @@
     tareasGlobales.principal.unshift({
       ...tarea,
       id: uid(),
+      recordar: false,
       creada: Date.now()
     });
     guardarEstado();
