@@ -37,18 +37,17 @@ function fechaLocalChileISO() {
 }
 
 async function enviarPush(subscription, payload, env) {
-  const builder = new PushBuilder({
-    subject: `mailto:${env.CONTACT_EMAIL}`,
-    publicKey: env.VAPID_PUBLIC_KEY,
-    privateKey: env.VAPID_PRIVATE_KEY
-  });
+  const pushRequest = await buildPushPayload(
+    payload,
+    subscription,
+    {
+      subject: `mailto:${env.CONTACT_EMAIL}`,
+      publicKey: env.VAPID_PUBLIC_KEY,
+      privateKey: env.VAPID_PRIVATE_KEY
+    }
+  );
 
-  const request = await builder
-    .setSubscription(subscription)
-    .setPayload(JSON.stringify(payload))
-    .build();
-
-  return fetch(subscription.endpoint, request);
+  return fetch(subscription.endpoint, pushRequest);
 }
 
 export default {
