@@ -1,4 +1,4 @@
-import { buildPushPayload } from '@pushforge/builder';
+import { buildPushHTTPRequest } from '@pushforge/builder';
 
 function normalizarRuta(pathname) {
   return pathname.replace(/\/{2,}/g, '/');
@@ -37,17 +37,22 @@ function fechaLocalChileISO() {
 }
 
 async function enviarPush(subscription, payload, env) {
-  const pushRequest = await buildPushPayload(
-    payload,
-    subscription,
-    {
-      subject: `mailto:${env.CONTACT_EMAIL}`,
-      publicKey: env.VAPID_PUBLIC_KEY,
-      privateKey: env.VAPID_PRIVATE_KEY
-    }
-  );
+  const privateJWK = JSON.parse(env.VAPID_PRIVATE_KEY);
 
-  return fetch(subscription.endpoint, pushRequest);
+  const { endpoint, headers, body } = await buildPushHTTPRequest({
+    privateJWK,
+    subscription,
+    message: {
+      payload,
+      adminContact: `mailto:${env.CONTACT_EMAIL}`
+    }
+  });
+
+  return fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body
+  });
 }
 
 export default {
