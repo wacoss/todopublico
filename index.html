@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1a2733" />
+  <title>To Do List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f0f2f7;
+      --panel: #FFF;
+      --card: #F9F9F9;
+      --surface-2: #edf0f5;
+      --surface-2-hover: #e2e6f0;
+      --check-bg: #f8f8f8;
+      --today-bg: #EEF3FD;
+      --today-border: #cdd6f6;
+      --text: #1f2a44;
+      --brandtext: #433ebd;
+      --muted: #78879a;
+      --handle: #a0aec0;
+      --checkbox: #8e9399;
+      --icon: #5b57d6;
+      --icon-hover: #433ebd;
+      --icon-hover-bg: #ded9ff;
+      --danger: #DC3545;
+      --danger-bg: #FEEBE7;
+      --success: #238b5a;
+      --success-bg: #e8f6ee;
+      --border: #d7dde3;
+      --focus-ring: 0 0 0 3px rgba(92, 87, 214, 0.25);
+      --shadow: 0 1px 0 rgba(255,255,255,.5) inset;
+      --radius-xl: 12px;
+      --radius-lg: 8px;
+      --t-fast: .15s ease;
+      --t-base: .18s ease;
+    }
+
+    html.dark {
+      --bg:#0c1118;
+      --panel:#141b26;
+      --card:#182130;
+      --surface-2:#1f2937;
+      --surface-2-hover:#28344a;
+      --check-bg:#161f2b;
+      --today-bg:linear-gradient(135deg,#1c2942,#212f4f);
+      --today-border:#3c4f8a;
+      --text:#eef2f8;
+      --brandtext: #eaf1f7;
+      --muted:#93a2b8;
+      --handle:#9fb0c4;
+      --checkbox:#7e8fa3;
+      --icon:#8b83ff;
+      --icon-hover:#a29bff;
+      --icon-hover-bg:rgba(139,131,255,.16);
+      --danger:#ff7b7f;
+      --danger-bg:rgba(255,123,127,.13);
+      --success:#5fd99b;
+      --success-bg:rgba(95,217,155,.13);
+      --border:rgba(255,255,255,.08);
+      --focus-ring:0 0 0 3px rgba(139,131,255,.3);
+      --shadow: 0 1px 0 rgba(255,255,255,.03) inset;
+     --accent-grad:linear-gradient(135deg,#8b83ff,#6b62f0);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+    }
+
+    .estado-vacio {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .top-wrapper,
+    .frame {
+      width: 760px;
+      max-width: 100%;
+    }
+
+    .top-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding-top: 6px;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;letter-spacing:-.02em;}
+.brand-badge{width:34px;height:34px;border-radius:6px;background:var(--icon);
+  display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 12px rgba(108,99,255,.35)}
+.brand-titulo {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brandtext);
+    }
+   .top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;}
+.db-link,.top-action-btn{color:var(--muted);font-size:.85em;text-decoration:none;font-weight:100;
+  border-radius:10px;transition:all var(--t-base);display:inline-flex;align-items:center;
+  justify-content:center;gap:6px;border:1px solid var(--border);padding:9px 14px;background:var(--panel);}
+.db-link:hover,.top-action-btn:hover{color:var(--icon);border-color:var(--icon);transform:translateY(-1px);
+  box-shadow:var(--shadow-card);}
+.db-link:focus-visible,.top-action-btn:focus-visible,.date-button-reset:focus-visible,.cal-btn:focus-visible,
+.cal-day:focus-visible,.action-btn:focus-visible,.title-input:focus,.desc-input:focus{
+  outline:none;box-shadow:var(--focus-ring);border-radius:8px;}
+.db-icon,.theme-icon-only svg,.btn-add-task svg,.action-btn svg{stroke:currentColor;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.db-icon{width:15px;height:15px;stroke-width:1.8;}
+.theme-icon-only{width:40px;height:40px;padding:0;}
+.theme-icon-only svg{width:17px;height:17px;stroke-width:2;}
+
+    .frame {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-top: 10px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .tabs-header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .nav-tabs-custom {
+      display: flex;
+      gap: 24px;
+      padding-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tab-link {
+      font-size: 1rem;
+      font-weight: 600;
+    
+      color: var(--muted);
+      text-decoration: none;
+      padding-bottom: 8px;
+      border-bottom: 2.5px solid transparent;
+      cursor: pointer;
+      transition: color var(--t-base), border-color var(--t-base);
+    }
+
+    .tab-link:hover { color: var(--text); }
+
+    .tab-link.active {
+      color: var(--icon);
+      border-bottom-color: var(--icon);
+    }
+
+    .btn-add-task {
+      background-color: var(--icon);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      font-size: 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--t-base), transform var(--t-base);
+    }
+
+    .btn-add-task:hover {
+      background-color: var(--icon-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-add-task.hidden { display: none; }
+
+    .btn-add-task svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 22px 84px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      transition: background-color .18s ease, border-color .18s ease, opacity .18s ease;
+    }
+
+    .item.tarea-eshoy {
+      background: var(--today-bg);
+      border-color: var(--today-border);
+    }
+
+    .item.tarea-secundaria {
+      background: var(--panel);
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .item.tarea-secundaria.dragging {
+      opacity: 0.4;
+      border: 1px dashed var(--icon);
+      background: var(--icon-hover-bg);
+    }
+
+    .item.tarea-completada {
+      background: var(--panel);
+      grid-template-columns: 84px minmax(0, 1fr) auto;
+      align-items: start;
+    }
+
+    .check {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid var(--checkbox);
+      border-radius: 3px;
+      background: var(--check-bg);
+      margin: 0;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .check:checked {
+      background: var(--icon);
+      border-color: var(--icon);
+    }
+
+    .check:checked::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .check:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .date-wrapper {
+      position: relative;
+      min-width: 84px;
+    }
+
+    .date-button-reset {
+      appearance: none;
+      -webkit-appearance: none;
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .date-static {
+      display: flex;
+      align-items: center;
+      min-height: 30px;
+      width: 100%;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .date-button-reset:hover .date-static,
+    .date-button-reset:focus-visible .date-static,
+    .date-button-reset:focus-within .date-static {
+      color: var(--icon);
+      text-decoration: underline;
+    }
+
+    .date-button-reset.no-hover {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .date-button-reset.no-hover:hover .date-static,
+    .date-button-reset.no-hover:focus-visible .date-static,
+    .date-button-reset.no-hover:focus-within .date-static {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .content { min-width: 0; }
+
+    .title-input,
+    .desc-input,
+    .title-static,
+    .desc-static {
+      width: 100%;
+      border-radius: 8px;
+      font-family: inherit;
+      line-height: 1.2;
+      /*padding: 4px 6px; */
+      margin-left: -6px;
+    }
+
+    .title-input,
+    .desc-input {
+      border: 1px solid transparent;
+      background: transparent;
+      resize: none;
+      overflow: hidden;
+    }
+
+    .title-static,
+    .desc-static {
+      border: 1px solid transparent;
+      background: transparent;
+      pointer-events: none;
+      user-select: text;
+    }
+
+    .title-input,
+    .title-static {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      /*min-height: 30px;*/
+    }
+
+    .desc-input,
+    .desc-static {
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 24px;
+      white-space: pre-wrap;
+    }
+
+    .title-input:hover,
+    .desc-input:hover {
+      border-color: var(--border);
+    }
+
+    .title-input:focus,
+    .desc-input:focus {
+      border-color: var(--icon);
+      background: var(--surface-2);
+    }
+
+    .optional-wrap {
+     /* margin-top: 4px; */
+    }
+
+    .optional-wrap.hidden {
+      display: none;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: var(--icon);
+      cursor: pointer;
+      transition: background-color var(--t-base), transform var(--t-base), color var(--t-base);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      background: var(--icon-hover-bg);
+    }
+
+    .action-btn.toggle-note.icon-active {
+      color: var(--icon);
+      background: var(--icon-hover-bg);
+    }
+
+    .action-btn.btn-danger-ghost {
+      color: var(--danger);
+    }
+
+    .action-btn.btn-danger-ghost:hover {
+      background-color: var(--danger-bg);
+    }
+
+    .action-btn.btn-success-ghost {
+      color: var(--success);
+    }
+
+    .action-btn.btn-success-ghost:hover {
+      background-color: var(--success-bg);
+    }
+
+    .action-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 1.8;
+      pointer-events: none;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--handle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px 0 4px;
+      user-select: none;
+      transition: color var(--t-fast);
+    }
+
+    .drag-handle svg {
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+      fill: currentColor;
+    }
+
+    .drag-handle:hover {
+      color: var(--icon);
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .calendario-flotante {
+      position: absolute;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 250px;
+      padding: 14px;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .calendario-flotante.show {
+      display: flex;
+    }
+
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .cal-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 1rem;
+      transition: background var(--t-fast);
+    }
+
+    .cal-btn:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .cal-day-name {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .cal-day {
+      padding: 6px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 0.85rem;
+      transition: background var(--t-fast);
+      border: none;
+      background: transparent;
+    }
+
+    .cal-day:hover {
+      background: var(--icon-hover-bg);
+      color: var(--icon-hover);
+      font-weight: 600;
+    }
+
+    .cal-day.selected {
+      background: var(--icon);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .cal-day.muted {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .cal-day.today {
+      border: 1px solid var(--icon);
+    }
+
+    @media (max-width: 700px) {
+      .frame { padding: 20px; }
+
+      .tabs-header-container,
+      .top-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .top-actions {
+        margin-left: 0;
+        justify-content: space-between;
+      }
+
+      .item {
+        grid-template-columns: 22px 1fr;
+      }
+
+      .item .date-wrapper,
+      .item .actions,
+      .item .date-static {
+        grid-column: 2 / -1;
+      }
+
+      .item.tarea-secundaria,
+      .item.tarea-completada {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        margin-left: 0;
+      }
+    }
+  
+    .top-action-btn.notif-active {
+      color: var(--icon);
+      border-color: var(--icon);
+      background: var(--icon-hover-bg);
+    }
+</style>
+</head>
+<body>
+
+<div class="top-wrapper">
+   <div class="brand">
+    <div class="brand-badge">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <span class="brand-titulo">To do localStorage</span>
+  </div>
+
+  <div class="top-actions">
+    <button id="btnNotificaciones" class="top-action-btn" type="button" aria-label="Activar notificaciones" onclick="activarNotificacionesPush()" title="Activar recordatorios push">
+      <svg class="db-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      Avisos
+    </button>
+    <button id="btnTema" class="top-action-btn theme-icon-only" type="button" aria-label="Cambiar tema">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg>
+    </button>
+  </div>
+</div>
+
+<section class="frame" aria-label="Gestor de Tareas">
+  <div class="tabs-header-container">
+    <div class="nav-tabs-custom" role="tablist">
+      <span class="tab-link active" id="tabPrincipal" role="tab" tabindex="0" aria-selected="true" onclick="cambiarPestana('principal')">Principal</span>
+      <span class="tab-link" id="tabSecundaria" role="tab" tabindex="0" aria-selected="false" onclick="cambiarPestana('secundaria')">Secundaria</span>
+      <span class="tab-link" id="tabCompletadas" role="tab" tabindex="0" aria-selected="false" onclick="cambiarPestana('completadas')">Completadas</span>
+    </div>
+    <button id="btnNuevaTarea" class="btn-add-task" type="button" onclick="crearNuevaTarea()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Nueva Tarea
+    </button>
+  </div>
+
+  <div class="list" id="listaTareas"><div class="estado-vacio">Cargando tareas...</div></div>
+</section>
+
+<div id="miCalendario" class="calendario-flotante" aria-hidden="true">
+  <div class="cal-header">
+    <button class="cal-btn" type="button" id="calPrev" aria-label="Mes anterior">&lt;</button>
+    <span id="calMesAno"></span>
+    <button class="cal-btn" type="button" id="calNext" aria-label="Mes siguiente">&gt;</button>
+  </div>
+  <div class="cal-grid" id="calDiasNombres">
+    <div class="cal-day-name">Lu</div><div class="cal-day-name">Ma</div>
+    <div class="cal-day-name">Mi</div><div class="cal-day-name">Ju</div>
+    <div class="cal-day-name">Vi</div><div class="cal-day-name">Sa</div>
+    <div class="cal-day-name">Do</div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<script>
+  // Configuración de Web Push y Cloudflare Worker
+  const WORKER_URL = 'https://dawn-rain-0ea5.jaunin.workers.dev/'; // Reemplazar con tu URL de Cloudflare
+  const VAPID_PUBLIC_KEY = 'BHkz_vETNFSEpTrgIoRmN8BAmetNAbZ0h1W8N1F84aI9zyBteQparaXVtpV_rFPHtKJY4-818yOAdnNYKXsElok'; // Clave pública generada
+
+  function urlBase64ToUint8Array(base64String) {
+    if (!base64String || base64String.includes('TU_VAPID')) return null;
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
+  function obtenerUserId() {
+    let uid = safeGetItem('todo_device_uid');
+    if (!uid) {
+      uid = 'dev_' + Math.random().toString(36).slice(2, 12);
+      safeSetItem('todo_device_uid', uid);
+    }
+    return uid;
+  }
+
+  async function actualizarEstadoBotonPush() {
+    const btn = document.getElementById('btnNotificaciones');
+    if (!btn) return;
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      btn.style.display = 'none';
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      btn.classList.add('notif-active');
+      btn.title = 'Notificaciones push activadas';
+    } else {
+      btn.classList.remove('notif-active');
+      btn.title = 'Activar recordatorios push';
+    }
+  }
+
+  async function activarNotificacionesPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('Tu navegador o dispositivo no soporta notificaciones Web Push.');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('Permiso de notificaciones no concedido.');
+        actualizarEstadoBotonPush();
+        return;
+      }
+
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      await navigator.serviceWorker.ready;
+
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        const keyArray = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+        const subOptions = { userVisibleOnly: true };
+        if (keyArray) subOptions.applicationServerKey = keyArray;
+        sub = await reg.pushManager.subscribe(subOptions);
+      }
+
+      if (WORKER_URL && !WORKER_URL.includes('TU-SUBDOMINIO')) {
+        await fetch(`${WORKER_URL}/api/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: obtenerUserId(),
+            subscription: sub
+          })
+        });
+        await sincronizarRecordatoriosConWorker();
+      }
+      actualizarEstadoBotonPush();
+      alert('¡Recordatorios activados correctamente!');
+    } catch (err) {
+      console.error('Error configurando Web Push:', err);
+      alert('Error activando notificaciones: ' + err.message);
+    }
+  }
+
+  let syncTimeout;
+  function sincronizarRecordatoriosConWorker() {
+    if (!WORKER_URL || WORKER_URL.includes('TU-SUBDOMINIO')) return;
+    clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(async () => {
+      try {
+        const userId = obtenerUserId();
+        const tareasConFecha = (tareasGlobales.principal || [])
+          .filter(t => !t.especial && t.fecha)
+          .map(t => ({ id: t.id, tarea: t.tarea, nota: t.nota, fecha: t.fecha }));
+
+        await fetch(`${WORKER_URL}/api/reminders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, reminders: tareasConFecha })
+        });
+      } catch (e) {
+        console.warn('No se pudo sincronizar con Cloudflare Worker:', e);
+      }
+    }, 1500);
+  }
+
+  const STORAGE_KEY = 'todoLocalStorageV10';
+  const THEME_KEY = 'todoLocalThemeV1';
+  
+  // Constantes globales para evitar re-crear los arrays
+  const NOMBRES_DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const NOMBRES_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  let pestanaActiva = 'principal';
+  let tareasGlobales = cargarEstado();
+  let calAñoAct = new Date().getFullYear();
+  let calMesAct = new Date().getMonth();
+  let tareaCalendarioId = null;
+
+  function safeGetItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function safeSetItem(key, value) {
+    try { localStorage.setItem(key, value); return true; } catch (e) { return false; }
+  }
+
+  function uid() {
+    return 'task-' + Math.random().toString(36).slice(2, 10);
+  }
+
+  function hoyISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function etiquetaFechaLargaHoy() {
+    const d = new Date();
+    return `Hoy es ${NOMBRES_DIAS[d.getDay()]} ${d.getDate()} de ${NOMBRES_MESES[d.getMonth()]}`;
+  }
+
+  function filaHoyEspecial() {
+    return {
+      id: 'fila-hoy-especial',
+      tarea: etiquetaFechaLargaHoy(),
+      nota: '',
+      fecha: hoyISO(),
+      creada: 0,
+      especial: true
+    };
+  }
+
+  function clonarEstadoBase() {
+    return {
+      principal: [
+        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), creada: Date.now() }
+      ],
+      secundaria: [],
+      completadas: []
+    };
+  }
+
+  function cargarEstado() {
+    try {
+      const raw = safeGetItem(STORAGE_KEY);
+      if (!raw) return clonarEstadoBase();
+      return normalizarEstado(JSON.parse(raw));
+    } catch (e) {
+      return clonarEstadoBase();
+    }
+  }
+
+  function normalizarEstado(data) {
+    const normalizeTask = (t) => ({
+      id: t && t.id ? t.id : uid(),
+      tarea: t && t.tarea ? t.tarea : 'Nueva tarea',
+      nota: t && t.nota ? t.nota : '',
+      fecha: t && t.fecha ? t.fecha : '',
+      creada: t && t.creada ? t.creada : Date.now(),
+      especial: !!(t && t.especial)
+    });
+
+    return {
+      principal: Array.isArray(data && data.principal) ? data.principal.map(normalizeTask) : [],
+      secundaria: Array.isArray(data && data.secundaria) ? data.secundaria.map(normalizeTask) : [],
+      completadas: Array.isArray(data && data.completadas) ? data.completadas.map(normalizeTask) : []
+    };
+  }
+
+  function guardarEstado() {
+    safeSetItem(STORAGE_KEY, JSON.stringify(tareasGlobales));
+    sincronizarRecordatoriosConWorker();
+  }
+
+  function bindAutosize(el) {
+    if (!el || el.tagName !== 'TEXTAREA') return;
+    const auto = () => {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    };
+    el.addEventListener('input', auto);
+    requestAnimationFrame(auto);
+  }
+
+  function cambiarPestana(tipo) {
+    if (pestanaActiva === tipo) return;
+    pestanaActiva = tipo;
+    cerrarCalendario();
+    document.getElementById('tabPrincipal').classList.toggle('active', tipo === 'principal');
+    document.getElementById('tabSecundaria').classList.toggle('active', tipo === 'secundaria');
+    document.getElementById('tabCompletadas').classList.toggle('active', tipo === 'completadas');
+    document.getElementById('tabPrincipal').setAttribute('aria-selected', String(tipo === 'principal'));
+    document.getElementById('tabSecundaria').setAttribute('aria-selected', String(tipo === 'secundaria'));
+    document.getElementById('tabCompletadas').setAttribute('aria-selected', String(tipo === 'completadas'));
+    renderizar();
+  }
+
+  function obtenerListaActiva() {
+    if (pestanaActiva === 'principal') return [filaHoyEspecial(), ...tareasGlobales.principal];
+    return tareasGlobales[pestanaActiva];
+  }
+
+  function ordenarPorFecha(lista) {
+    return lista.slice().sort((a, b) => {
+      if (a.fecha && b.fecha) return a.fecha.localeCompare(b.fecha);
+      if (a.fecha) return -1;
+      if (b.fecha) return 1;
+      return a.creada - b.creada;
+    });
+  }
+
+  function etiquetaFecha(iso) {
+    if (!iso) return 'Sin fecha';
+    const p = iso.split('-');
+    return `${parseInt(p[2], 10)}/${parseInt(p[1], 10)}/${p[0]}`;
+  }
+
+  function esHoy(iso) {
+    return !!iso && iso === hoyISO();
+  }
+
+  function crearTextarea(clase, valor, placeholder, onChange) {
+    const el = document.createElement('textarea');
+    el.className = clase;
+    el.rows = 1;
+    el.placeholder = placeholder || '';
+    el.value = valor || '';
+    bindAutosize(el);
+    el.addEventListener('change', onChange);
+    return el;
+  }
+
+  function actualizarBotonNuevaTarea() {
+    document.getElementById('btnNuevaTarea').classList.toggle('hidden', pestanaActiva === 'completadas');
+  }
+
+  function renderizar() {
+    actualizarBotonNuevaTarea();
+    const contenedor = document.getElementById('listaTareas');
+    contenedor.innerHTML = '';
+
+    let tareas = obtenerListaActiva().slice();
+    if (pestanaActiva === 'principal' || pestanaActiva === 'completadas') tareas = ordenarPorFecha(tareas);
+
+    if (tareas.length === 0) {
+      const vacio = document.createElement('div');
+      vacio.className = 'estado-vacio';
+      vacio.textContent = pestanaActiva === 'principal'
+        ? 'No hay tareas principales'
+        : pestanaActiva === 'secundaria'
+          ? 'No hay tareas secundarias'
+          : 'No hay tareas completadas';
+      contenedor.appendChild(vacio);
+      return;
+    }
+
+    tareas.forEach((t, index) => contenedor.appendChild(crearFilaTarea(t, index)));
+    if (pestanaActiva === 'secundaria') inicializarDragAndDropSecundaria(contenedor);
+  }
+
+  function crearFilaTarea(t, index) {
+    const row = document.createElement('article');
+    row.dataset.id = t.id;
+    row.dataset.index = index;
+
+    const esEspecial = !!t.especial;
+
+    if (pestanaActiva === 'secundaria') row.className = 'item tarea-secundaria';
+    else if (pestanaActiva === 'completadas') row.className = 'item tarea-completada';
+    else row.className = esHoy(t.fecha) ? 'item tarea-eshoy' : 'item';
+
+    if (pestanaActiva === 'secundaria') {
+      row.setAttribute('draggable', 'true');
+      row.addEventListener('dragstart', (e) => {
+        row.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', t.id);
+        }
+      });
+      row.addEventListener('dragend', () => row.classList.remove('dragging'));
+    }
+
+    if (pestanaActiva === 'principal') {
+      const check = document.createElement('input');
+      check.className = 'check';
+      check.type = 'checkbox';
+      if (!esEspecial) check.title = 'Completar tarea';
+      check.disabled = esEspecial;
+      if (!esEspecial) check.addEventListener('change', () => completarTarea(t.id));
+      row.appendChild(check);
+
+      const dateWrapper = document.createElement('div');
+      dateWrapper.className = 'date-wrapper';
+
+      const dateButton = document.createElement('button');
+      dateButton.className = 'date-button-reset' + (esEspecial ? ' no-hover' : '');
+      dateButton.type = 'button';
+      if (!esEspecial) dateButton.title = 'Cambiar fecha';
+
+      const dateText = document.createElement('div');
+      dateText.className = 'date-static';
+      dateText.textContent = etiquetaFecha(t.fecha);
+
+      dateButton.appendChild(dateText);
+
+      if (!esEspecial) {
+        dateButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          abrirMiCalendario(dateButton, t.id);
+        });
+      } else {
+        dateButton.tabIndex = -1;
+        dateButton.style.pointerEvents = 'none';
+        dateButton.style.cursor = 'default';
+      }
+
+      dateWrapper.appendChild(dateButton);
+      row.appendChild(dateWrapper);
+    }
+
+    if (pestanaActiva === 'secundaria') {
+      const drag = document.createElement('div');
+      drag.className = 'drag-handle';
+      drag.title = 'Arrastra para reordenar';
+      drag.setAttribute('aria-hidden', 'true');
+      drag.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>';
+      row.appendChild(drag);
+    }
+
+    if (pestanaActiva === 'completadas') {
+      const dateWrapper = document.createElement('div');
+      dateWrapper.className = 'date-wrapper';
+
+      const dateStatic = document.createElement('div');
+      dateStatic.className = 'date-static';
+      dateStatic.textContent = etiquetaFecha(t.fecha);
+
+      dateWrapper.appendChild(dateStatic);
+      row.appendChild(dateWrapper);
+    }
+
+    const content = document.createElement('div');
+    content.className = 'content';
+
+    if (pestanaActiva === 'completadas') {
+      const titleStatic = document.createElement('div');
+      titleStatic.className = 'title-static';
+      titleStatic.textContent = t.tarea || '';
+      content.appendChild(titleStatic);
+
+      if (t.nota && t.nota.trim() !== '') {
+        const descStatic = document.createElement('div');
+        descStatic.className = 'desc-static';
+        descStatic.textContent = t.nota;
+        content.appendChild(descStatic);
+      }
+
+      row.appendChild(content);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const restoreBtn = document.createElement('button');
+      restoreBtn.className = 'action-btn btn-success-ghost';
+      restoreBtn.type = 'button';
+      restoreBtn.title = 'Restablecer tarea';
+      restoreBtn.textContent = '↺';
+      restoreBtn.addEventListener('click', () => restablecerTarea(t.id));
+      actions.appendChild(restoreBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'action-btn btn-danger-ghost';
+      deleteBtn.type = 'button';
+      deleteBtn.title = 'Eliminar tarea';
+      deleteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+      deleteBtn.addEventListener('click', () => eliminarTarea('completadas', t.id));
+      actions.appendChild(deleteBtn);
+
+      row.appendChild(actions);
+      return row;
+    }
+
+    if (esEspecial) {
+      const titleStatic = document.createElement('div');
+      titleStatic.className = 'title-static';
+      titleStatic.textContent = t.tarea || '';
+      content.appendChild(titleStatic);
+      row.appendChild(content);
+      row.appendChild(document.createElement('div')).className = 'actions';
+      return row;
+    }
+
+    const titleInput = crearTextarea('title-input', t.tarea, 'Nombre de la tarea', () => {
+      actualizarTarea(pestanaActiva, t.id, { tarea: titleInput.value.trim() || 'Nueva tarea' });
+    });
+    content.appendChild(titleInput);
+
+    const noteWrap = document.createElement('div');
+    noteWrap.className = 'optional-wrap' + (t.nota && t.nota.trim() !== '' ? '' : ' hidden');
+
+    const descInput = crearTextarea('desc-input', t.nota, 'Texto opcional', () => {
+      actualizarTarea(pestanaActiva, t.id, { nota: descInput.value.trim() });
+    });
+
+    noteWrap.appendChild(descInput);
+    content.appendChild(noteWrap);
+    row.appendChild(content);
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const toggleNoteBtn = document.createElement('button');
+    const noteVisible = !noteWrap.classList.contains('hidden');
+    toggleNoteBtn.className = 'action-btn toggle-note' + (noteVisible ? ' icon-active' : '');
+    toggleNoteBtn.type = 'button';
+    toggleNoteBtn.title = noteVisible ? 'Ocultar texto opcional' : 'Mostrar texto opcional';
+    toggleNoteBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M7 5h10"></path><path d="M7 9h10"></path><path d="M7 13h6"></path></svg>';
+    toggleNoteBtn.addEventListener('click', () => {
+      const isHidden = noteWrap.classList.contains('hidden');
+      noteWrap.classList.toggle('hidden', !isHidden);
+      toggleNoteBtn.classList.toggle('icon-active', isHidden);
+      toggleNoteBtn.title = isHidden ? 'Ocultar texto opcional' : 'Mostrar texto opcional';
+      if (isHidden) requestAnimationFrame(() => descInput.focus());
+    });
+    actions.appendChild(toggleNoteBtn);
+
+
+    if (pestanaActiva === 'secundaria') {
+      const delBtn = document.createElement('button');
+      delBtn.className = 'action-btn btn-danger-ghost';
+      delBtn.type = 'button';
+      delBtn.title = 'Eliminar tarea';
+      delBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+      delBtn.addEventListener('click', () => eliminarTarea('secundaria', t.id));
+      actions.appendChild(delBtn);
+    }
+
+    row.appendChild(actions);
+    return row;
+  }
+
+  function inicializarDragAndDropSecundaria(contenedor) {
+    contenedor.ondragenter = (e) => {
+      if (pestanaActiva !== 'secundaria') return;
+      e.preventDefault();
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move';
+      }
+    };
+
+    contenedor.ondragover = (e) => {
+      if (pestanaActiva !== 'secundaria') return;
+      e.preventDefault();
+      
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move';
+      }
+      
+      const draggingItem = contenedor.querySelector('.dragging');
+      if (!draggingItem) return;
+      const items = [...contenedor.querySelectorAll('.tarea-secundaria:not(.dragging)')];
+      const siguiente = items.find(i => e.clientY - i.getBoundingClientRect().top - i.getBoundingClientRect().height / 2 < 0);
+      if (siguiente == null) contenedor.appendChild(draggingItem);
+      else contenedor.insertBefore(draggingItem, siguiente);
+    };
+
+    contenedor.ondrop = (e) => {
+      if (pestanaActiva !== 'secundaria') return;
+      e.preventDefault();
+      guardarNuevoOrdenSecundarias();
+    };
+  }
+
+  function guardarNuevoOrdenSecundarias() {
+    const contenedor = document.getElementById('listaTareas');
+    const items = [...contenedor.querySelectorAll('.tarea-secundaria')];
+    const idsOrdenados = items.map(item => item.dataset.id);
+    tareasGlobales.secundaria.sort((a, b) => idsOrdenados.indexOf(a.id) - idsOrdenados.indexOf(b.id));
+    guardarEstado();
+    renderizar();
+  }
+
+  function abrirMiCalendario(elemento, taskId) {
+    const cal = document.getElementById('miCalendario');
+    
+    // Si el calendario ya está abierto para esta misma tarea, lo cerramos
+    if (cal.classList.contains('show') && tareaCalendarioId === taskId) {
+      cerrarCalendario();
+      return;
+    }
+
+    tareaCalendarioId = taskId;
+    const tarea = tareasGlobales.principal.find(t => t.id === taskId);
+    if (!tarea || tarea.especial) return;
+
+    if (tarea.fecha) {
+      const p = tarea.fecha.split('-');
+      calAñoAct = parseInt(p[0], 10);
+      calMesAct = parseInt(p[1], 10) - 1;
+    } else {
+      const hoy = new Date();
+      calAñoAct = hoy.getFullYear();
+      calMesAct = hoy.getMonth();
+    }
+
+    dibujarMes();
+    posicionarCalendario(elemento);
+  }
+
+  function posicionarCalendario(elemento) {
+    const cal = document.getElementById('miCalendario');
+    const rect = elemento.getBoundingClientRect();
+    const CALENDAR_OFFSET_Y = -90;
+    const CALENDAR_OFFSET_X = 260;
+    const CALENDAR_MIN_LEFT = 10;
+
+    if (cal.parentNode !== document.body) document.body.appendChild(cal);
+    cal.style.position = 'absolute';
+    cal.style.top = (rect.top + window.scrollY + CALENDAR_OFFSET_Y) + 'px';
+
+    let leftPos = rect.left + window.scrollX - CALENDAR_OFFSET_X;
+    if (leftPos < CALENDAR_MIN_LEFT) leftPos = CALENDAR_MIN_LEFT;
+
+    cal.style.left = leftPos + 'px';
+    cal.classList.add('show');
+    cal.setAttribute('aria-hidden', 'false');
+  }
+
+  function cerrarCalendario() {
+    const cal = document.getElementById('miCalendario');
+    cal.classList.remove('show');
+    cal.setAttribute('aria-hidden', 'true');
+    tareaCalendarioId = null;
+  }
+
+  function cambiarMes(dir) {
+    calMesAct += dir;
+    if (calMesAct < 0) {
+      calMesAct = 11;
+      calAñoAct--;
+    }
+    if (calMesAct > 11) {
+      calMesAct = 0;
+      calAñoAct++;
+    }
+    dibujarMes();
+  }
+
+  function dibujarMes() {
+    document.getElementById('calMesAno').innerText = `${NOMBRES_MESES[calMesAct]} ${calAñoAct}`;
+
+    const diasMes = new Date(calAñoAct, calMesAct + 1, 0).getDate();
+    const indexPrimerDia = new Date(calAñoAct, calMesAct, 1).getDay();
+    const inicio = indexPrimerDia === 0 ? 6 : indexPrimerDia - 1;
+
+    const hoy = new Date();
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+    const tarea = tareasGlobales.principal.find(t => t.id === tareaCalendarioId);
+    const fechaSeleccionada = tarea ? tarea.fecha : '';
+
+    let html = '';
+    for (let i = 0; i < inicio; i++) html += '<div class="cal-day muted"></div>';
+
+    for (let i = 1; i <= diasMes; i++) {
+      const d = String(i).padStart(2, '0');
+      const m = String(calMesAct + 1).padStart(2, '0');
+      const fechaStr = `${calAñoAct}-${m}-${d}`;
+
+      let claseExtra = '';
+      if (fechaSeleccionada === fechaStr) claseExtra += ' selected';
+      if (fechaStr === hoyStr) claseExtra += ' today';
+
+      html += `<button type="button" class="cal-day${claseExtra}" data-fecha="${fechaStr}">${i}</button>`;
+    }
+
+    document.getElementById('calGrid').innerHTML = html;
+  }
+
+  function seleccionarDia(fechaStr) {
+    const tarea = tareasGlobales.principal.find(t => t.id === tareaCalendarioId);
+    if (!tarea || tarea.especial) return;
+    const nuevaFecha = tarea.fecha === fechaStr ? '' : fechaStr;
+    actualizarTarea('principal', tarea.id, { fecha: nuevaFecha });
+    cerrarCalendario();
+  }
+
+  function crearNuevaTarea() {
+    const destino = pestanaActiva === 'completadas' ? 'principal' : pestanaActiva;
+    tareasGlobales[destino].push({
+      id: uid(),
+      tarea: 'Nueva tarea',
+      nota: '',
+      fecha: destino === 'principal' ? hoyISO() : '',
+      creada: Date.now()
+    });
+    guardarEstado();
+    if (pestanaActiva === 'completadas') cambiarPestana('principal');
+    else renderizar();
+  }
+
+  function actualizarTarea(lista, id, patch) {
+    const item = tareasGlobales[lista].find(x => x.id === id);
+    if (!item || item.especial) return;
+    Object.assign(item, patch);
+    guardarEstado();
+    renderizar();
+  }
+
+  function eliminarTarea(lista, id) {
+    if (!confirm('¿Eliminar tarea?')) return;
+    tareasGlobales[lista] = tareasGlobales[lista].filter(x => x.id !== id);
+    guardarEstado();
+    renderizar();
+  }
+
+  function completarTarea(id) {
+    const idx = tareasGlobales.principal.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const tarea = tareasGlobales.principal[idx];
+    if (tarea.especial) return;
+    tareasGlobales.principal.splice(idx, 1);
+    tareasGlobales.completadas.unshift({ ...tarea });
+    guardarEstado();
+    renderizar();
+  }
+
+  function restablecerTarea(id) {
+    const idx = tareasGlobales.completadas.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const tarea = tareasGlobales.completadas[idx];
+    tareasGlobales.completadas.splice(idx, 1);
+    tareasGlobales.principal.unshift({
+      ...tarea,
+      id: uid(),
+      creada: Date.now()
+    });
+    guardarEstado();
+    cambiarPestana('principal');
+  }
+
+  function aplicarTema(theme) {
+    document.documentElement.classList.toggle('dark', theme !== 'light');
+  }
+
+  function inicializarTema() {
+    const saved = safeGetItem(THEME_KEY) || 'dark';
+    aplicarTema(saved);
+    document.getElementById('btnTema').addEventListener('click', () => {
+      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+      safeSetItem(THEME_KEY, next);
+      aplicarTema(next);
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const cal = document.getElementById('miCalendario');
+    if (cal.classList.contains('show') && !cal.contains(e.target) && !e.target.closest('.date-button-reset')) {
+      cerrarCalendario();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    actualizarEstadoBotonPush();
+    // Permitir arrastrar sobre toda la pantalla sin cursor prohibido
+    document.body.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    });
+    document.body.addEventListener('drop', (e) => e.preventDefault());
+
+    inicializarTema();
+
+    document.getElementById('tabPrincipal').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cambiarPestana('principal');
+      }
+    });
+
+    document.getElementById('tabSecundaria').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cambiarPestana('secundaria');
+      }
+    });
+
+    document.getElementById('tabCompletadas').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cambiarPestana('completadas');
+      }
+    });
+
+    document.getElementById('calPrev').addEventListener('click', () => cambiarMes(-1));
+    document.getElementById('calNext').addEventListener('click', () => cambiarMes(1));
+
+    document.getElementById('calGrid').addEventListener('click', (e) => {
+      const btn = e.target.closest('.cal-day[data-fecha]');
+      if (!btn) return;
+      seleccionarDia(btn.dataset.fecha);
+    });
+
+    renderizar();
+  });
+</script>
+
+</body>
+</html>
