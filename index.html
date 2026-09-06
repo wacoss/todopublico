@@ -3,8 +3,9 @@ Fuente worker:
 https://dawn-rain-0ea5.jaunin.workers.dev/
 https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/view/dawn-rain-0ea5/production
 -->
+
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <base target="_top">
@@ -576,36 +577,118 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
     }
 
     @media (max-width: 700px) {
-      .frame { padding: 20px; }
+      body {
+        padding: 8px;
+      }
 
-      .tabs-header-container,
       .top-wrapper {
+        padding: 4px 6px;
+        margin-bottom: 6px;
+      }
+
+      .frame {
+        padding: 16px 12px;
+        margin-top: 4px;
+        border-radius: var(--radius-lg);
+      }
+
+      .tabs-header-container {
         flex-direction: column;
         align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
       }
 
-      .top-actions {
-        margin-left: 0;
-        justify-content: space-between;
+      .nav-tabs-custom {
+        gap: 16px;
+        justify-content: flex-start;
       }
 
+      .btn-add-task {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+      }
+
+      /* Disposición limpia de las filas de tareas en móvil */
       .item {
-        grid-template-columns: 22px 1fr;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 10px;
+        padding: 10px;
       }
 
-      .item .date-wrapper,
-      .item .actions,
+      .item .check {
+        flex-shrink: 0;
+        order: 1;
+      }
+
+      .item .date-wrapper {
+        order: 2;
+        min-width: auto;
+      }
+
       .item .date-static {
-        grid-column: 2 / -1;
+        font-size: 12px;
+        min-height: auto;
       }
 
-      .item.tarea-secundaria,
-      .item.tarea-completada {
-        grid-template-columns: 1fr;
+      .item .actions {
+        order: 3;
+        margin-left: auto;
+        gap: 4px;
       }
 
-      .actions {
+      .item .content {
+        order: 4;
+        width: 100%;
         margin-left: 0;
+        padding-left: 2px;
+      }
+
+      .title-input, .desc-input, .title-static, .desc-static {
+        margin-left: 0;
+        padding: 4px 0;
+        font-size: 15px;
+      }
+
+      .item.tarea-secundaria {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .item.tarea-secundaria .drag-handle {
+        order: 1;
+      }
+
+      .item.tarea-secundaria .content {
+        order: 2;
+        flex: 1 1 calc(100% - 80px);
+      }
+
+      .item.tarea-secundaria .actions {
+        order: 3;
+        margin-left: auto;
+      }
+
+      .item.tarea-completada {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .item.tarea-completada .date-wrapper {
+        order: 1;
+      }
+
+      .item.tarea-completada .actions {
+        order: 2;
+        margin-left: auto;
+      }
+
+      .item.tarea-completada .content {
+        order: 3;
+        width: 100%;
       }
     }
   
@@ -632,7 +715,7 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
-      Avisos
+      Activar Recordatorios
     </button>
     <button id="btnTema" class="top-action-btn theme-icon-only" type="button" aria-label="Cambiar tema">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg>
@@ -831,7 +914,7 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   function clonarEstadoBase() {
     return {
       principal: [
-        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), recordar: false, creada: Date.now() }
+        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), recordar: true, creada: Date.now() }
       ],
       secundaria: [],
       completadas: []
@@ -1304,7 +1387,7 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
       tarea: 'Nueva tarea',
       nota: '',
       fecha: destino === 'principal' ? hoyISO() : '',
-      recordar: false,
+      recordar: destino === 'principal',
       creada: Date.now()
     });
     guardarEstado();
@@ -1354,11 +1437,14 @@ https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/vi
   }
 
   function aplicarTema(theme) {
-    document.documentElement.classList.toggle('dark', theme !== 'light');
+    const isDark = theme === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#1a2733' : '#f0f2f7');
   }
 
   function inicializarTema() {
-    const saved = safeGetItem(THEME_KEY) || 'dark';
+    const saved = safeGetItem(THEME_KEY) || 'light';
     aplicarTema(saved);
     document.getElementById('btnTema').addEventListener('click', () => {
       const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
