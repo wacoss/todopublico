@@ -1,5 +1,6 @@
 import { buildPushHTTPRequest } from '@pushforge/builder';
 
+
 function normalizarRuta(pathname) {
   return pathname.replace(/\/{2,}/g, '/');
 }
