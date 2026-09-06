@@ -578,6 +578,11 @@
       gap: 2px;
     }
 
+    .task-card.tarea-principal .card-body,
+    .task-card:not(.tarea-secundaria):not(.tarea-completada) .card-body {
+      padding-left: 34px;
+    }
+
     .title-input,
     .desc-input {
       width: 100%;
@@ -1571,7 +1576,7 @@
     const claseBase = 'task-card';
     if (pestanaActiva === 'secundaria') card.className = `${claseBase} tarea-secundaria`;
     else if (pestanaActiva === 'completadas') card.className = `${claseBase} tarea-completada`;
-    else card.className = esPasada(t.fecha) ? `${claseBase} tarea-pasada` : claseBase;
+    else card.className = `${claseBase} tarea-principal${esPasada(t.fecha) ? ' tarea-pasada' : ''}`;
 
     // Fila Superior (Checkbox / Fecha / Reordenar / Acciones)
     const topRow = document.createElement('div');
