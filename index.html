@@ -297,8 +297,9 @@
       width: 32px;
       height: 32px;
       border-radius: var(--radius-md);
-      background: #f5f3ff;
-      color: #6d28d9;
+      background: var(--card-subtle);
+      border: 1px solid var(--border);
+      color: var(--icon);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -306,8 +307,9 @@
     }
 
     html.dark .today-badge-icon {
-      background: rgba(139, 92, 246, 0.16);
-      color: #c4b5fd;
+      background: var(--card-subtle);
+      border-color: var(--border);
+      color: var(--icon);
     }
 
     .today-badge-icon svg {
@@ -456,23 +458,23 @@
     }
 
     .date-chip.is-today {
-      background: #f5f3ff;
-      color: #6d28d9;
-      border-color: #ddd6fe;
+      background: var(--card-subtle);
+      color: var(--text-secondary);
+      border-color: var(--border);
     }
 
     .date-chip.is-today svg {
-      color: #6d28d9;
+      color: var(--icon);
     }
 
     html.dark .date-chip.is-today {
-      background: rgba(139, 92, 246, 0.16);
-      color: #c4b5fd;
-      border-color: rgba(167, 139, 250, 0.3);
+      background: var(--card-subtle);
+      color: var(--text-secondary);
+      border-color: var(--border);
     }
 
     html.dark .date-chip.is-today svg {
-      color: #c4b5fd;
+      color: var(--icon);
     }
 
     .date-chip.is-past {
