@@ -357,6 +357,16 @@
       background: var(--surface-2);
     }
 
+    .task-card.tarea-pasada .title-input,
+    .task-card.tarea-pasada .title-static {
+      color: var(--muted);
+    }
+
+    .task-card.tarea-pasada .desc-input,
+    .task-card.tarea-pasada .desc-static {
+      color: var(--muted);
+    }
+
     html.dark .task-card.tarea-pasada {
       background: var(--surface-2);
       border-color: var(--border);
@@ -1200,7 +1210,7 @@
     }
   }
 
-  function mostrarToast(mensaje, duracion = 4000) {
+  function mostrarToast(mensaje, duracion = 4500) {
     const toast = document.getElementById('mobileToast');
     const toastMsg = document.getElementById('toastMessage');
     if (!toast || !toastMsg) return;
