@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="theme-color" content="#4f46e5" id="metaThemeColor" />
   <title>To Do List</title>
   <meta name="description" content="Aplicación móvil de lista de tareas y recordatorios con almacenamiento local." />
   <meta property="og:title" content="To Do List" />
@@ -26,8 +25,8 @@
       --surface-2: #edf0f5;
       --surface-2-hover: #e2e6f0;
       --check-bg: #f8fafc;
-      --today-bg: #eef2ff;
-      --today-border: #c7d2fe;
+      --today-bg: #f0fdf4;
+      --today-border: #bbf7d0;
       --text: #0f172a;
       --text-secondary: #475569;
       --brandtext: #3730a3;
@@ -66,8 +65,8 @@
       --surface-2: #1e293b;
       --surface-2-hover: #2d3b55;
       --check-bg: #151e30;
-      --today-bg: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(99, 102, 241, 0.12));
-      --today-border: rgba(99, 102, 241, 0.45);
+      --today-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(5, 150, 105, 0.1));
+      --today-border: rgba(52, 211, 153, 0.35);
       --text: #f8fafc;
       --text-secondary: #cbd5e1;
       --brandtext: #e0e7ff;
@@ -290,8 +289,8 @@
     /* Resumen / Tarjeta del Día */
     .today-summary-bar {
       margin: 4px 14px 10px 14px;
-      background: var(--panel);
-      border: 1px solid var(--border);
+      background: var(--today-bg);
+      border: 1px solid var(--today-border);
       border-radius: var(--radius-lg);
       padding: 10px 14px;
       display: flex;
@@ -310,12 +309,17 @@
       width: 32px;
       height: 32px;
       border-radius: var(--radius-md);
-      background: var(--icon-hover-bg);
-      color: var(--icon);
+      background: #dcfce7;
+      color: #16a34a;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
+
+    html.dark .today-badge-icon {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
     }
 
     .today-badge-icon svg {
@@ -335,8 +339,15 @@
       font-weight: 600;
       padding: 4px 9px;
       border-radius: 20px;
-      background: var(--surface-2);
-      color: var(--muted);
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    html.dark .today-metric-pill {
+      background: rgba(16, 185, 129, 0.22);
+      color: #6ee7b7;
+      border: 1px solid rgba(52, 211, 153, 0.35);
     }
 
     /* Contenedor de la lista de tareas */
@@ -462,9 +473,23 @@
     }
 
     .date-chip.is-today {
-      background: var(--icon-hover-bg);
-      color: var(--icon);
+      background: #dcfce7;
+      color: #15803d;
       border-color: var(--today-border);
+    }
+
+    .date-chip.is-today svg {
+      color: #16a34a;
+    }
+
+    html.dark .date-chip.is-today {
+      background: rgba(16, 185, 129, 0.22);
+      color: #6ee7b7;
+      border-color: var(--today-border);
+    }
+
+    html.dark .date-chip.is-today svg {
+      color: #34d399;
     }
 
     .date-chip.no-hover {
@@ -898,8 +923,9 @@
     }
 
     .cal-cell.today {
-      border-color: var(--icon);
-      color: var(--icon);
+      border-color: #10b981;
+      color: #10b981;
+      font-weight: 700;
     }
 
     .cal-cell.selected {
@@ -1927,9 +1953,6 @@
       sun.classList.toggle('hidden', !isDark);
       moon.classList.toggle('hidden', isDark);
     }
-
-    const metaTheme = document.getElementById('metaThemeColor');
-    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0b0f19' : '#4f46e5');
   }
 
   function inicializarTema() {
