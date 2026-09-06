@@ -1,0 +1,16 @@
+{
+  "name": "dawn-rain-0ea5",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-06",
+  "kv_namespaces": [
+    {
+      "binding": "TODO_KV",
+      "id": "PEGA_AQUI_EL_NAMESPACE_ID"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/15 * * * *"
+    ]
+  }
+}
