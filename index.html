@@ -1009,11 +1009,13 @@
       transition: transform var(--t-base), opacity var(--t-base);
       pointer-events: none;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     .mobile-toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
+      pointer-events: auto;
     }
 
     .toast-dot {
@@ -1178,7 +1180,7 @@
 </div>
 
 <!-- Toast flotante para avisos móviles -->
-<div id="mobileToast" class="mobile-toast" role="status" aria-live="polite">
+<div id="mobileToast" class="mobile-toast" role="status" aria-live="polite" onclick="cerrarToast()" title="Toca para descartar">
   <div class="toast-dot"></div>
   <span id="toastMessage">Acción completada</span>
 </div>
@@ -1190,7 +1192,15 @@
   const WORKER_URL = 'https://dawn-rain-0ea5.jaunin.workers.dev/'; 
   const VAPID_PUBLIC_KEY = 'BHkz_vETNFSEpTrgIoRmN8BAmetNAbZ0h1W8N1F84aI9zyBteQparaXVtpV_rFPHtKJY4-818yOAdnNYKXsElok'; 
 
-  function mostrarToast(mensaje) {
+  function cerrarToast() {
+    const toast = document.getElementById('mobileToast');
+    if (toast) {
+      clearTimeout(toast._timeout);
+      toast.classList.remove('show');
+    }
+  }
+
+  function mostrarToast(mensaje, duracion = 4000) {
     const toast = document.getElementById('mobileToast');
     const toastMsg = document.getElementById('toastMessage');
     if (!toast || !toastMsg) return;
@@ -1199,7 +1209,7 @@
     clearTimeout(toast._timeout);
     toast._timeout = setTimeout(() => {
       toast.classList.remove('show');
-    }, 4000);
+    }, duracion);
   }
 
   function urlBase64ToUint8Array(base64String) {
