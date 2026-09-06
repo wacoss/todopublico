@@ -1,5 +1,8 @@
-
-
+<!--
+Fuente worker:
+https://dawn-rain-0ea5.jaunin.workers.dev/
+https://dash.cloudflare.com/037251db28911f295d62e30cffdc00e1/workers/services/view/dawn-rain-0ea5/production
+-->
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
@@ -828,7 +831,7 @@
   function clonarEstadoBase() {
     return {
       principal: [
-        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), recordar: true, creada: Date.now() }
+        { id: uid(), tarea: 'Tarea de ejemplo', nota: '', fecha: hoyISO(), recordar: false, creada: Date.now() }
       ],
       secundaria: [],
       completadas: []
@@ -1301,7 +1304,7 @@
       tarea: 'Nueva tarea',
       nota: '',
       fecha: destino === 'principal' ? hoyISO() : '',
-      recordar: destino === 'principal',
+      recordar: false,
       creada: Date.now()
     });
     guardarEstado();
