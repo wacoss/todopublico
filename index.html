@@ -25,8 +25,7 @@
       --surface-2: #edf0f5;
       --surface-2-hover: #e2e6f0;
       --check-bg: #f8fafc;
-      /*--today-bg: #eef2ff; */
-      --today-bg: #FDFFE8; 
+      --today-bg: #eef2ff;
       --today-border: #c7d2fe;
       --text: #0f172a;
       --text-secondary: #475569;
@@ -284,26 +283,31 @@
     /* Fila de Fecha de Hoy (intercalada cronológicamente) */
     .today-summary-bar {
       margin: 0;
-      background: var(--today-bg);
-      border: 1px solid var(--today-border);
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 11px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-card);
     }
 
     .today-badge-icon {
       width: 32px;
       height: 32px;
       border-radius: var(--radius-md);
-      background: var(--icon-hover-bg);
-      color: var(--icon);
+      background: #f5f3ff;
+      color: #6d28d9;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
+
+    html.dark .today-badge-icon {
+      background: rgba(139, 92, 246, 0.16);
+      color: #c4b5fd;
     }
 
     .today-badge-icon svg {
@@ -331,19 +335,30 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 12px 14px;
+      padding: 10px 14px 12px 14px;
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 2px;
       position: relative;
       transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
       touch-action: pan-y;
     }
 
-    .task-card.tarea-eshoy {
-      background: var(--today-bg);
-      border-color: var(--today-border);
+    .task-card.tarea-pasada {
+      background: var(--surface-2);
+      border-color: var(--border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .task-card.tarea-pasada .check {
+      background: var(--surface-2);
+    }
+
+    html.dark .task-card.tarea-pasada {
+      background: var(--surface-2);
+      border-color: var(--border);
+      box-shadow: none;
     }
 
     .task-card.dragging {
@@ -361,9 +376,9 @@
 
     /* Touch Checkbox */
     .check-touch-target {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -441,13 +456,43 @@
     }
 
     .date-chip.is-today {
-      background: var(--icon-hover-bg);
-      color: var(--icon);
-      border-color: var(--today-border);
+      background: #f5f3ff;
+      color: #6d28d9;
+      border-color: #ddd6fe;
     }
 
     .date-chip.is-today svg {
-      color: var(--icon);
+      color: #6d28d9;
+    }
+
+    html.dark .date-chip.is-today {
+      background: rgba(139, 92, 246, 0.16);
+      color: #c4b5fd;
+      border-color: rgba(167, 139, 250, 0.3);
+    }
+
+    html.dark .date-chip.is-today svg {
+      color: #c4b5fd;
+    }
+
+    .date-chip.is-past {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+
+    .date-chip.is-past svg {
+      color: var(--muted);
+    }
+
+    html.dark .date-chip.is-past {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    html.dark .date-chip.is-past svg {
+      color: var(--muted);
     }
 
     .date-chip.no-hover {
@@ -464,9 +509,9 @@
     }
 
     .touch-action-btn {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
       border-radius: var(--radius-md);
       border: none;
       background: transparent;
@@ -485,8 +530,8 @@
     }
 
     .touch-action-btn svg {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       stroke: currentColor;
       fill: none;
       stroke-width: 1.9;
@@ -528,7 +573,7 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
     }
 
     .title-input,
@@ -542,8 +587,8 @@
       overflow: hidden;
       outline: none;
       color: var(--text);
-      line-height: 1.35;
-      padding: 4px 6px;
+      line-height: 1.3;
+      padding: 1px 6px;
       margin-left: -6px;
       transition: background-color var(--t-fast), border-color var(--t-fast);
     }
@@ -1378,6 +1423,12 @@
     const hoy = hoyISO();
     if (iso === hoy) return 'Hoy';
     
+    // Ayer
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    const aStr = `${ayer.getFullYear()}-${String(ayer.getMonth()+1).padStart(2,'0')}-${String(ayer.getDate()).padStart(2,'0')}`;
+    if (iso === aStr) return 'Ayer';
+
     // Mañana
     const manana = new Date();
     manana.setDate(manana.getDate() + 1);
@@ -1390,6 +1441,10 @@
 
   function esHoy(iso) {
     return !!iso && iso === hoyISO();
+  }
+
+  function esPasada(iso) {
+    return !!iso && iso < hoyISO();
   }
 
   function crearTextarea(clase, valor, placeholder, onChange) {
@@ -1504,7 +1559,7 @@
     const claseBase = 'task-card';
     if (pestanaActiva === 'secundaria') card.className = `${claseBase} tarea-secundaria`;
     else if (pestanaActiva === 'completadas') card.className = `${claseBase} tarea-completada`;
-    else card.className = esHoy(t.fecha) ? `${claseBase} tarea-eshoy` : claseBase;
+    else card.className = esPasada(t.fecha) ? `${claseBase} tarea-pasada` : claseBase;
 
     // Fila Superior (Checkbox / Fecha / Reordenar / Acciones)
     const topRow = document.createElement('div');
@@ -1530,7 +1585,8 @@
 
       // Chip de Fecha con icono de calendario
       const dateChip = document.createElement('button');
-      dateChip.className = 'date-chip' + (esHoy(t.fecha) ? ' is-today' : '');
+      const extraClass = esHoy(t.fecha) ? ' is-today' : (esPasada(t.fecha) ? ' is-past' : '');
+      dateChip.className = 'date-chip' + extraClass;
       dateChip.type = 'button';
       dateChip.title = 'Cambiar fecha de la tarea';
       dateChip.innerHTML = `
